@@ -32,21 +32,20 @@ public class Ftp extends Activity implements OnClickListener {
 
 	private String ip, user, pass;
 	private String port;
-	
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ftp);
 
 		ftpclient = new MyFTPClient();
-		
-		
+
 		Bundle gotBasket = getIntent().getExtras();
 		ip = gotBasket.getString("ip");
 		port = gotBasket.getString("port");
 		user = gotBasket.getString("user");
 		pass = gotBasket.getString("pass");
-		
-		//Login(ip, port, user, pass);
+
+		// Login(ip, port, user, pass);
 		new Login().execute(ip, port, user, pass);
 		View downloadButton = findViewById(R.id.upload);
 		downloadButton.setOnClickListener(this);
@@ -56,33 +55,6 @@ public class Ftp extends Activity implements OnClickListener {
 		contentButton.setOnClickListener(this);
 	}
 
-	/*
-	private void Login(final String ip, final int port, final String user, final String pass){
-		new Thread(new Runnable() {
-			
-			public void run() {
-				boolean status = false;
-				// Replace your UID & PW here
-				status = ftpclient.ftpConnect(ip, user, pass, port);
-				if (status == true) {
-					Log.d("login", "Connection Success");
-					//status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
-				} else {
-					// Toast.makeText(getApplicationContext(),
-					// "Connection failed", 2000).show();
-					Log.e("login", "Connection failed");
-					Disconnect();
-					Intent i = new Intent(Ftp.this, MainActivity.class);
-					Bundle b = new Bundle();
-					b.putString("failed", "Connection failed");
-					i.putExtras(b);
-					startActivity(i);
-				}
-				
-			}
-		}).start();
-	}
-	*/
 	public void onClick(View v) {
 		switch (v.getId()) {
 
@@ -152,21 +124,21 @@ public class Ftp extends Activity implements OnClickListener {
 		}
 
 	}
-	
+
 	public class Login extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog dialog;
-		
+
 		protected void onPreExecute() {
 			dialog = new ProgressDialog(Ftp.this);
 			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			dialog.setMax(100);
 			dialog.show();
-			
+
 		}
 
 		protected String doInBackground(String... args) {
-			
+
 			for (int i = 0; i < 20; i++) {
 				publishProgress(5);
 				try {
@@ -183,7 +155,8 @@ public class Ftp extends Activity implements OnClickListener {
 				status = ftpclient.ftpConnect(args[0], args[2], args[3], Integer.parseInt(args[1]));
 				if (status == true) {
 					Log.d("login", "Connection Success");
-					//status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
+					// status = ftpclient.ftpUpload(TEMP_FILENAME,
+					// TEMP_FILENAME, "/", cntx);
 					res = "true";
 				} else {
 					// Toast.makeText(getApplicationContext(),
@@ -203,9 +176,9 @@ public class Ftp extends Activity implements OnClickListener {
 		}
 
 		protected void onPostExecute(String result) {
-			if(result == "true"){
+			if (result == "true") {
 				Toast.makeText(Ftp.this, "succes", Toast.LENGTH_LONG).show();
-				//basket.put
+				// basket.put
 
 			} else {
 				Disconnect();
