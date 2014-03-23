@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class Ftp extends Activity implements OnClickListener {
@@ -33,26 +34,36 @@ public class Ftp extends Activity implements OnClickListener {
 	private String ip, user, pass;
 	private String port;
 
+	private Button downloadButton, uploadButton, contentButton;
+	
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ftp);
 
 		ftpclient = new MyFTPClient();
 
+		downloadButton = (Button)findViewById(R.id.upload);
+		uploadButton = (Button)findViewById(R.id.disconnect);
+		contentButton = (Button)findViewById(R.id.getContent);
+		
+		downloadButton.setOnClickListener(this);
+		uploadButton.setOnClickListener(this);
+		contentButton.setOnClickListener(this);
+		
+		downloadButton.setEnabled(false);
+		
+		uploadButton.setEnabled(false);
+		contentButton.setEnabled(false);
+		
 		Bundle gotBasket = getIntent().getExtras();
 		ip = gotBasket.getString("ip");
 		port = gotBasket.getString("port");
 		user = gotBasket.getString("user");
 		pass = gotBasket.getString("pass");
 
-		// Login(ip, port, user, pass);
 		new Login().execute(ip, port, user, pass);
-		View downloadButton = findViewById(R.id.upload);
-		downloadButton.setOnClickListener(this);
-		View uploadButton = findViewById(R.id.disconnect);
-		uploadButton.setOnClickListener(this);
-		View contentButton = findViewById(R.id.getContent);
-		contentButton.setOnClickListener(this);
+		
 	}
 
 	public void onClick(View v) {
@@ -86,6 +97,7 @@ public class Ftp extends Activity implements OnClickListener {
 			break;
 		case R.id.disconnect:
 			Disconnect();
+			logout();
 			break;
 		case R.id.exit:
 			Disconnect();
@@ -94,6 +106,11 @@ public class Ftp extends Activity implements OnClickListener {
 			break;
 		}
 
+	}
+
+	private void logout() {
+		Intent i = new Intent(Ftp.this, MainActivity.class);
+		startActivity(i);
 	}
 
 	void Disconnect() {
@@ -176,9 +193,16 @@ public class Ftp extends Activity implements OnClickListener {
 		}
 
 		protected void onPostExecute(String result) {
+			if(result == null){
+				Toast.makeText(Ftp.this, "ERROR", Toast.LENGTH_LONG).show();
+			}
+			
 			if (result == "true") {
 				Toast.makeText(Ftp.this, "succes", Toast.LENGTH_LONG).show();
 				// basket.put
+				downloadButton.setEnabled(true);
+				uploadButton.setEnabled(true);
+				contentButton.setEnabled(true);
 
 			} else {
 				Disconnect();
