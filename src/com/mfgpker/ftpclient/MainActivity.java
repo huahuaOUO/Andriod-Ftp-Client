@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements OnClickListener   {
 		case R.id.login:
 			
 			String ip = this.ip.getText().toString();
-			String port =this.port.getText().toString();
+			String port = this.port.getText().toString();
 			String user = this.username.getText().toString();
 			String pass = this.password.getText().toString();
 			
