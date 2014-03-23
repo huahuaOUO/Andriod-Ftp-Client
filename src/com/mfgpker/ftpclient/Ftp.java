@@ -41,7 +41,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	private String ip, user, pass, port;
 	private ListView contentList;
 	private List<String> realcontents = new ArrayList<String>();
-	private Button btnUpload, btnDisconnect, btnContent, btnExit;
+	private Button btnUpload, btnDisconnect, btnContent;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,12 +53,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		btnUpload = (Button) findViewById(R.id.upload);
 		btnDisconnect = (Button) findViewById(R.id.disconnect);
 		btnContent = (Button) findViewById(R.id.getContent);
-		btnExit = (Button) findViewById(R.id.exit);
 
 		btnDisconnect.setOnClickListener(this);
 		btnUpload.setOnClickListener(this);
 		btnContent.setOnClickListener(this);
-		btnExit.setOnClickListener(this);
 
 		contentList = (ListView) findViewById(R.id.contentList);
 		contentList.setOnItemClickListener(this);
@@ -112,11 +110,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		case R.id.disconnect:
 			Disconnect();
 			logout();
-			break;
-		case R.id.exit:
-			Disconnect();
-			this.finish();
-			Log.d(TAG, "Exit");
 			break;
 		}
 
@@ -198,6 +191,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		getContent();
 		while (!yolo) {
 		}
+		Log.d(TAG, "yolo is " + yolo);
 		contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
 		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
