@@ -42,7 +42,8 @@ public class Ftp extends Activity implements OnClickListener {
 		setContentView(R.layout.ftp);
 
 		ftpclient = new MyFTPClient();
-
+		createDummyFile();
+		cntx = this.getBaseContext();
 		downloadButton = (Button)findViewById(R.id.upload);
 		uploadButton = (Button)findViewById(R.id.disconnect);
 		contentButton = (Button)findViewById(R.id.getContent);
