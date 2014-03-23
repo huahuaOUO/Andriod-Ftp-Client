@@ -4,20 +4,10 @@
     android:layout_height="match_parent" >
 
 	<Button
-	    android:id="@+id/disconnect"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/getContent"
-	    android:text="Disconnect from ftp" />
-
-	
-	<Button
 	    android:id="@+id/exit"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentBottom="true"
-	    android:layout_alignParentLeft="true"
 	    android:text="Exit" />
 
 	<Button
@@ -29,12 +19,20 @@
 	    android:text="Get Content" />
 
 	<Button
+	    android:id="@+id/disconnect"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_centerVertical="true"
+	    android:text="Disconnect from ftp" />
+
+	<Button
 	    android:id="@+id/upload"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/disconnect"
+	    android:layout_below="@+id/getContent"
+	    android:layout_marginTop="17dp"
 	    android:text="Upload file to ftp" />
-
 	
 </RelativeLayout>

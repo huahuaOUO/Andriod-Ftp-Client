@@ -29,6 +29,7 @@ public class Ftp extends Activity implements OnClickListener {
 	String workingDir;
 	private static final String TAG = "MainActivity";
 	private static final String TEMP_FILENAME = "test.txt";
+	
 	private Context cntx = null;
 
 	private String ip, user, pass;
@@ -87,7 +88,7 @@ public class Ftp extends Activity implements OnClickListener {
 					}
 				}
 			}).start();
-			break;
+			break; 
 		case R.id.getContent:
 			new Thread(new Runnable() {
 				public void run() {
