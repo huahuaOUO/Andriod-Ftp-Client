@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OnClickListener {
 					} else {
 						// Toast.makeText(getApplicationContext(),
 						// "Connection failed", 2000).show();
-						
+						//d
 						Log.d(TAG, "Connection failed");
 						
 					}
