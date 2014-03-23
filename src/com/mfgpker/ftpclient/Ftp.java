@@ -261,7 +261,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			}
 
 			if (result == "true") {
-				Toast.makeText(Ftp.this, "succes", Toast.LENGTH_LONG).show();
+				Toast.makeText(Ftp.this, MyFTPClient.replay, Toast.LENGTH_LONG).show();
 				// basket.put
 				btnDisconnect.setEnabled(true);
 				btnUpload.setEnabled(true);

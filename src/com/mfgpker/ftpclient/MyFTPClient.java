@@ -24,19 +24,21 @@ public class MyFTPClient  {
 
 	private static final String TAG = "MyFTPClient";
 	public FTPClient mFTPClient = null;
-
+	static public String replay;
 	// Method to connect to FTP server:
 	public boolean ftpConnect(String host, String username, String password, int port) {
 		try {
 			mFTPClient = new FTPClient();
 			// connecting to the host
+			
 			mFTPClient.connect(host, port);
-
+			Log.d(TAG, "*REPLY:: " + mFTPClient.getReplyString());
+			replay =  mFTPClient.getReplyString();
 			// now check the reply code, if positive mean connection success
 			if (FTPReply.isPositiveCompletion(mFTPClient.getReplyCode())) {
 				// login using username & password
 				boolean status = mFTPClient.login(username, password);
-
+				
 				/*
 				 * Set File Transfer Mode
 				 * 
