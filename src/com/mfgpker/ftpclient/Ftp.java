@@ -59,11 +59,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		btnUpload.setOnClickListener(this);
 		btnContent.setOnClickListener(this);
 		btnExit.setOnClickListener(this);
-		
+
 		contentList = (ListView) findViewById(R.id.contentList);
 		contentList.setOnItemClickListener(this);
-		
-		
+
 		btnDisconnect.setEnabled(false);
 		btnUpload.setEnabled(false);
 		btnContent.setEnabled(false);
@@ -75,11 +74,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		pass = gotBasket.getString("pass");
 
 		new Login().execute(ip, port, user, pass);
-		//contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
+		// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
+		// android.R.layout.simple_list_item_1, realcontents));
 	}
 
-	
-	
 	public void onClick(View v) {
 		switch (v.getId()) {
 
@@ -127,13 +125,15 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
 		Log.d(TAG, realcontents.get(pos));
 	}
-	
+
 	private void logout() {
+		realcontents.clear();
 		Intent i = new Intent(Ftp.this, MainActivity.class);
 		startActivity(i);
 	}
 
 	void Disconnect() {
+		realcontents.clear();
 		new Thread(new Runnable() {
 			public void run() {
 				ftpclient.ftpDisconnect();
@@ -163,13 +163,13 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	}
 
 	private boolean yolo = false;
-	
+
 	private void getContent() {
 		new Thread("contentThread") {
 			public void run() {
 				realcontents.clear();
 				String[] contents;
-				
+
 				// ftpclient.ftpPrintFilesList(workingDir);
 				contents = ftpclient.getContentList(workingDir);
 				Log.d(TAG, "begin----------------------------begin");
@@ -181,7 +181,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 						con = con.substring(5);
 						Log.d(TAG, "file: " + con);
 					} else {
-						con = con.substring(10);
+						con = con.substring(10) + "/";
 						Log.d(TAG, "dir: " + con);
 					}
 					realcontents.add(con);
@@ -192,17 +192,16 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			}
 		}.start();
 	}
-	
-	
-	private void updateList(){
+
+	private void updateList() {
 		yolo = false;
 		getContent();
-		while(!yolo){
+		while (!yolo) {
 		}
 		contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
 		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
-	
+
 	public class Login extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog dialog;
@@ -217,33 +216,32 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 		protected String doInBackground(String... args) {
 
-			for (int i = 0; i < 20; i++) {
-				publishProgress(5);
-				try {
-					Thread.sleep(88);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			dialog.dismiss();
 			try {
 				boolean status = false;
 				String res = "false";
 				// Replace your UID & PW here
 				status = ftpclient.ftpConnect(args[0], args[2], args[3], Integer.parseInt(args[1]));
+				for (int i = 0; i < 20; i++) {
+					publishProgress(5);
+					try {
+						Thread.sleep(88);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 				if (status == true) {
 					Log.d("login", "Connection Success");
 					// status = ftpclient.ftpUpload(TEMP_FILENAME,
 					// TEMP_FILENAME, "/", cntx);
 					workingDir = ftpclient.ftpGetCurrentWorkingDirectory();
-					
 					res = "true";
 				} else {
 					// Toast.makeText(getApplicationContext(),
 					// "Connection failed", 2000).show();
-					Log.e("login", "Connection failed");
+					Log.e("login", "Connection failed: " + MyFTPClient.replay);
 					res = "false";
 				}
+				dialog.dismiss();
 				return res;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -266,10 +264,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				btnDisconnect.setEnabled(true);
 				btnUpload.setEnabled(true);
 				btnContent.setEnabled(true);
-				
-				//getContent();
+
+				// getContent();
 				updateList();
-				
+
 			} else {
 				Disconnect();
 				Intent i = new Intent(Ftp.this, MainActivity.class);
@@ -281,7 +279,5 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 		}
 	}
-
-	
 
 }

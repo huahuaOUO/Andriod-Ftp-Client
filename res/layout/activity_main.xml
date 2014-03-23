@@ -9,15 +9,7 @@
             android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login to ftp" />
-
-	<Button
-	    android:id="@+id/exit"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_alignParentLeft="true"
-	    android:text="Exit" />
+            android:text="Login to server" />
 
 	<EditText
 	    android:id="@+id/etPort"
