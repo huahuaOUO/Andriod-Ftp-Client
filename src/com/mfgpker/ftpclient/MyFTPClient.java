@@ -19,7 +19,7 @@ import org.apache.commons.net.ftp.FTPReply;
 import android.content.Context;
 import android.util.Log;
 
-public class MyFTPClient {
+public class MyFTPClient  {
 	// Now, declare a public FTP client object.
 
 	private static final String TAG = "MyFTPClient";

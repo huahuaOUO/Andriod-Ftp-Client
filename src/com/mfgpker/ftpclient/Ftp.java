@@ -11,13 +11,17 @@ package com.mfgpker.ftpclient;
 import java.io.FileOutputStream;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
-public class Ftp extends Activity implements OnClickListener{
+public class Ftp extends Activity implements OnClickListener {
 
 	MyFTPClient ftpclient;
 
@@ -25,12 +29,25 @@ public class Ftp extends Activity implements OnClickListener{
 	private static final String TAG = "MainActivity";
 	private static final String TEMP_FILENAME = "test.txt";
 	private Context cntx = null;
-	
+
+	private String ip, user, pass;
+	private String port;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ftp);
+
+		ftpclient = new MyFTPClient();
 		
+		
+		Bundle gotBasket = getIntent().getExtras();
+		ip = gotBasket.getString("ip");
+		port = gotBasket.getString("port");
+		user = gotBasket.getString("user");
+		pass = gotBasket.getString("pass");
+		
+		//Login(ip, port, user, pass);
+		new Login().execute(ip, port, user, pass);
 		View downloadButton = findViewById(R.id.upload);
 		downloadButton.setOnClickListener(this);
 		View uploadButton = findViewById(R.id.disconnect);
@@ -38,28 +55,37 @@ public class Ftp extends Activity implements OnClickListener{
 		View contentButton = findViewById(R.id.getContent);
 		contentButton.setOnClickListener(this);
 	}
-	
+
+	/*
+	private void Login(final String ip, final int port, final String user, final String pass){
+		new Thread(new Runnable() {
+			
+			public void run() {
+				boolean status = false;
+				// Replace your UID & PW here
+				status = ftpclient.ftpConnect(ip, user, pass, port);
+				if (status == true) {
+					Log.d("login", "Connection Success");
+					//status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
+				} else {
+					// Toast.makeText(getApplicationContext(),
+					// "Connection failed", 2000).show();
+					Log.e("login", "Connection failed");
+					Disconnect();
+					Intent i = new Intent(Ftp.this, MainActivity.class);
+					Bundle b = new Bundle();
+					b.putString("failed", "Connection failed");
+					i.putExtras(b);
+					startActivity(i);
+				}
+				
+			}
+		}).start();
+	}
+	*/
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.login:
-			new Thread(new Runnable() {
-				public void run() {
-					boolean status = false;
-					// Replace your UID & PW here
-					status = ftpclient.ftpConnect("192.168.1.121", "bob", "frank", 800);
-					if (status == true) {
-						Log.d(TAG, "Connection Success");
-						//status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
 
-					} else {
-						// Toast.makeText(getApplicationContext(),
-						// "Connection failed", 2000).show();
-						Log.e(TAG, "Connection failed");
-						
-					}
-				}
-			}).start();
-			break;
 		case R.id.upload:
 			new Thread(new Runnable() {
 				public void run() {
@@ -67,11 +93,13 @@ public class Ftp extends Activity implements OnClickListener{
 					status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
 					if (status == true) {
 						Log.d(TAG, "Upload success");
-						//Toast.makeText(MainActivity.this,"Upload success.", Toast.LENGTH_LONG).show();
+						// Toast.makeText(MainActivity.this,"Upload success.",
+						// Toast.LENGTH_LONG).show();
 					} else {
 						Log.e(TAG, "Upload failed");
-						
-						//Toast.makeText(MainActivity.this, "Upload failed.", Toast.LENGTH_LONG).show();
+
+						// Toast.makeText(MainActivity.this, "Upload failed.",
+						// Toast.LENGTH_LONG).show();
 					}
 				}
 			}).start();
@@ -95,7 +123,6 @@ public class Ftp extends Activity implements OnClickListener{
 		}
 
 	}
-	
 
 	void Disconnect() {
 		new Thread(new Runnable() {
@@ -106,12 +133,11 @@ public class Ftp extends Activity implements OnClickListener{
 		}).start();
 	}
 
-	
 	protected void onDestroy() {
 		super.onDestroy();
 		Disconnect();
 	}
-	
+
 	public void createDummyFile() {
 		try {
 			FileOutputStream fos;
@@ -125,6 +151,72 @@ public class Ftp extends Activity implements OnClickListener{
 			e.printStackTrace();
 		}
 
+	}
+	
+	public class Login extends AsyncTask<String, Integer, String> {
+
+		ProgressDialog dialog;
+		
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(Ftp.this);
+			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			dialog.setMax(100);
+			dialog.show();
+			
+		}
+
+		protected String doInBackground(String... args) {
+			
+			for (int i = 0; i < 20; i++) {
+				publishProgress(5);
+				try {
+					Thread.sleep(88);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			dialog.dismiss();
+			try {
+				boolean status = false;
+				String res = "false";
+				// Replace your UID & PW here
+				status = ftpclient.ftpConnect(args[0], args[2], args[3], Integer.parseInt(args[1]));
+				if (status == true) {
+					Log.d("login", "Connection Success");
+					//status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
+					res = "true";
+				} else {
+					// Toast.makeText(getApplicationContext(),
+					// "Connection failed", 2000).show();
+					Log.e("login", "Connection failed");
+					res = "false";
+				}
+				return res;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+			dialog.incrementProgressBy(progress[0]);
+		}
+
+		protected void onPostExecute(String result) {
+			if(result == "true"){
+				Toast.makeText(Ftp.this, "succes", Toast.LENGTH_LONG).show();
+				//basket.put
+
+			} else {
+				Disconnect();
+				Intent i = new Intent(Ftp.this, MainActivity.class);
+				Bundle b = new Bundle();
+				b.putString("failed", "Connection failed");
+				i.putExtras(b);
+				startActivity(i);
+			}
+
+		}
 	}
 
 }
