@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+	<Button
+	    android:id="@+id/getContent"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBottom="@+id/upload"
+	    android:layout_alignParentLeft="true"
+	    android:layout_marginBottom="50dp"
+	    android:text="Get Content" />
+
+	<Button
+	    android:id="@+id/upload"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginTop="178dp"
+	    android:text="Upload file to ftp" />
+
+	<Button
+	    android:id="@+id/disconnect"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/getContent"
+	    android:text="Disconnect from ftp" />
+
+	
+	<Button
+	    android:id="@+id/exit"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft="true"
+	    android:text="Exit" />
+	
+</RelativeLayout>
