@@ -21,12 +21,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class Ftp extends Activity implements OnClickListener {
+public class Ftp extends Activity implements OnClickListener, OnItemClickListener {
 
 	MyFTPClient ftpclient;
 
@@ -59,7 +61,9 @@ public class Ftp extends Activity implements OnClickListener {
 		btnExit.setOnClickListener(this);
 		
 		contentList = (ListView) findViewById(R.id.contentList);
-
+		contentList.setOnItemClickListener(this);
+		
+		
 		btnDisconnect.setEnabled(false);
 		btnUpload.setEnabled(false);
 		btnContent.setEnabled(false);
@@ -74,6 +78,8 @@ public class Ftp extends Activity implements OnClickListener {
 		//contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
 	}
 
+	
+	
 	public void onClick(View v) {
 		switch (v.getId()) {
 
@@ -118,6 +124,10 @@ public class Ftp extends Activity implements OnClickListener {
 
 	}
 
+	public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
+		Log.d(TAG, realcontents.get(pos));
+	}
+	
 	private void logout() {
 		Intent i = new Intent(Ftp.this, MainActivity.class);
 		startActivity(i);
@@ -152,33 +162,45 @@ public class Ftp extends Activity implements OnClickListener {
 
 	}
 
+	private boolean yolo = false;
+	
 	private void getContent() {
 		new Thread("contentThread") {
 			public void run() {
+				realcontents.clear();
 				String[] contents;
-
+				
 				// ftpclient.ftpPrintFilesList(workingDir);
 				contents = ftpclient.getContentList(workingDir);
-
+				Log.d(TAG, "begin----------------------------begin");
+				Log.d(TAG, "length: " + contents.length);
 				for (int i = 0; i < contents.length; i++) {
 					// Log.d(TAG, con);
 					String con = contents[i];
 					if (con.startsWith("file:")) {
 						con = con.substring(5);
-						Log.d(TAG, con);
+						Log.d(TAG, "file: " + con);
 					} else {
 						con = con.substring(10);
-						Log.d(TAG, con);
+						Log.d(TAG, "dir: " + con);
 					}
 					realcontents.add(con);
 				}
+				Log.d(TAG, "Done----------------------------Done");
+				Log.d(TAG, "*realcontents, length: " + realcontents.size());
+				yolo = true;
 			}
 		}.start();
 	}
 	
+	
 	private void updateList(){
+		yolo = false;
 		getContent();
+		while(!yolo){
+		}
 		contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
+		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
 	
 	public class Login extends AsyncTask<String, Integer, String> {
@@ -259,5 +281,7 @@ public class Ftp extends Activity implements OnClickListener {
 
 		}
 	}
+
+	
 
 }
