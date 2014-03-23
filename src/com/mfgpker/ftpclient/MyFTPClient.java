@@ -118,6 +118,30 @@ public class MyFTPClient  {
 		}
 	}
 
+	
+	public String[] getContentList(String dir_path) {
+		String[] content;
+		try {
+			FTPFile[] ftpFiles = mFTPClient.listFiles(dir_path);
+			int length = ftpFiles.length;
+			content = new String[length];
+			for (int i = 0; i < length; i++) {
+				String name = ftpFiles[i].getName();
+				boolean isFile = ftpFiles[i].isFile();
+				
+				if (isFile) {
+					content[i] = "file:" + name;
+				} else {
+					content[i] = "directory:" + name;
+				}
+			}
+			return content;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	// Method to create new directory:
 
 	public boolean ftpMakeDirectory(String new_dir_path) {

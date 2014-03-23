@@ -19,8 +19,6 @@
 	    android:layout_alignParentLeft="true"
 	    android:text="Exit" />
 
-	
-
 	<EditText
 	    android:id="@+id/etPort"
 	    android:layout_width="34dp"
