@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login to ftp" />
+
+        <Button
+            android:id="@+id/upload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload file to ftp" />
+
+        <Button
+            android:id="@+id/getContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Content" />
+
+	<Button
+	    android:id="@+id/disconnect"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="Disconnect from ftp" />
+
+	<Button
+	    android:id="@+id/exit"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="Exit" />
+	
+</LinearLayout>
