@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OnClickListener {
 					} else {
 						// Toast.makeText(getApplicationContext(),
 						// "Connection failed", 2000).show();
-						Log.d(TAG, "Connection failed");
+						Log.e(TAG, "Connection failed");
 						
 					}
 				}
@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						Log.d(TAG, "Upload success");
 						//Toast.makeText(MainActivity.this,"Upload success.", Toast.LENGTH_LONG).show();
 					} else {
-						Log.d(TAG, "Upload failed");
+						Log.e(TAG, "Upload failed");
 						
 						//Toast.makeText(MainActivity.this, "Upload failed.", Toast.LENGTH_LONG).show();
 					}

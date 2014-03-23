@@ -51,7 +51,7 @@ public class MyFTPClient {
 				return status;
 			}
 		} catch (Exception e) {
-			Log.d(TAG, "Error: could not connect to host " + host);
+			Log.e(TAG, "Error: could not connect to host " + host);
 		}
 
 		return false;
@@ -65,7 +65,7 @@ public class MyFTPClient {
 			mFTPClient.disconnect();
 			return true;
 		} catch (Exception e) {
-			Log.d(TAG, "Error occurred while disconnecting from ftp server.");
+			Log.e(TAG, "Error occurred while disconnecting from ftp server.");
 		}
 
 		return false;
@@ -78,7 +78,7 @@ public class MyFTPClient {
 			String workingDir = mFTPClient.printWorkingDirectory();
 			return workingDir;
 		} catch (Exception e) {
-			Log.d(TAG, "Error: could not get current working directory.");
+			Log.e(TAG, "Error: could not get current working directory.");
 		}
 
 		return null;
@@ -90,7 +90,7 @@ public class MyFTPClient {
 		try {
 			mFTPClient.changeWorkingDirectory(directory_path);
 		} catch (Exception e) {
-			Log.d(TAG, "Error: could not change directory to " + directory_path);
+			Log.e(TAG, "Error: could not change directory to " + directory_path);
 		}
 
 		return false;
@@ -125,7 +125,7 @@ public class MyFTPClient {
 			boolean status = mFTPClient.makeDirectory(new_dir_path);
 			return status;
 		} catch (Exception e) {
-			Log.d(TAG, "Error: could not create new directory named " + new_dir_path);
+			Log.e(TAG, "Error: could not create new directory named " + new_dir_path);
 		}
 
 		return false;
@@ -138,7 +138,7 @@ public class MyFTPClient {
 			boolean status = mFTPClient.removeDirectory(dir_path);
 			return status;
 		} catch (Exception e) {
-			Log.d(TAG, "Error: could not remove directory named " + dir_path);
+			Log.e(TAG, "Error: could not remove directory named " + dir_path);
 		}
 
 		return false;
@@ -152,6 +152,7 @@ public class MyFTPClient {
 			return status;
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.e(TAG, "Error: could not delete file " + filePath);
 		}
 
 		return false;
@@ -164,7 +165,7 @@ public class MyFTPClient {
 			boolean status = mFTPClient.rename(from, to);
 			return status;
 		} catch (Exception e) {
-			Log.d(TAG, "Could not rename file: " + from + " to: " + to);
+			Log.e(TAG, "Could not rename file: " + from + " to: " + to);
 		}
 
 		return false;
@@ -187,7 +188,7 @@ public class MyFTPClient {
 
 			return status;
 		} catch (Exception e) {
-			Log.d(TAG, "download failed");
+			Log.e(TAG, "download failed");
 		}
 
 		return status;
@@ -216,7 +217,7 @@ public class MyFTPClient {
 			srcFileStream.close();
 			return status;
 		} catch (Exception e) {
-			Log.d(TAG, "upload failed: " + e);
+			Log.e(TAG, "upload failed: " + e);
 		}
 
 		return status;
