@@ -71,6 +71,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		user = gotBasket.getString("user");
 		pass = gotBasket.getString("pass");
 
+		if(port.isEmpty()) port = "21";
+		
 		new Login().execute(ip, port, user, pass);
 		// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
 		// android.R.layout.simple_list_item_1, realcontents));

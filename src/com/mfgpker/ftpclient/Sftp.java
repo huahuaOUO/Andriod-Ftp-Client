@@ -8,88 +8,97 @@
  */
 package com.mfgpker.ftpclient;
 
-import java.io.FileOutputStream;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 
-public class Sftp extends Activity {
-	private static final String TEMP_FILENAME = "test.txt";
-	
+public class Sftp extends Activity implements OnClickListener {
+
+	Session session = null;
+	Channel channel = null;
+	ChannelSftp channelSftp = null;
+	JSch jsch = null;
+
+	String SFTPHOST = "192.168.1.129";
+	int SFTPPORT = 22;
+	String SFTPUSER = "frank";
+	String SFTPPASS = "blankrank";
+	String SFTPWORKINGDIR;// = "/home/frank/";
+
+	Button disc;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.sftp);
 
-		String SFTPHOST = "192.168.1.129";
-		int SFTPPORT = 22;
-		String SFTPUSER = "frank";
-		String SFTPPASS = "blankrank";
-		String SFTPWORKINGDIR = "/home/frank/";
+		Bundle gotBasket = getIntent().getExtras();
+		// SFTPHOST = gotBasket.getString("ip");
+		// SFTPPORT = Integer.parseInt(gotBasket.getString("port"));
+		// SFTPUSER = gotBasket.getString("user");
+		// SFTPPASS = gotBasket.getString("pass");
 
-		Session session = null;
-		Channel channel = null;
-		ChannelSftp channelSftp = null;
+		disc = (Button) findViewById(R.id.disconnectstp);
+		disc.setOnClickListener(this);
 
-		try {
-			JSch jsch = new JSch();
-			session = jsch.getSession(SFTPUSER, SFTPHOST, SFTPPORT);
-			session.setPassword(SFTPPASS);
-			java.util.Properties config = new java.util.Properties();
-			config.put("StrictHostKeyChecking", "no");
-			//session.setConfig(config);
-			session.connect(); // crash here!
-			channel = session.openChannel("sftp");
-			channel.connect();
-			channelSftp = (ChannelSftp) channel;
-			
-			channelSftp.cd(SFTPWORKINGDIR);
-			channelSftp.get("remotefile.txt", "localfile.txt");
-			//File f = new File(FILETOTRANSFER);
-			//channelSftp.put(new FileInputStream(f), f.getName());
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		/*
-		 * JSch jsch = new JSch(); Session session = null; try { session =
-		 * jsch.getSession("frank", "192.168.1.129", 21);
-		 * session.setConfig("StrictHostKeyChecking", "no");
-		 * session.setPassword("blankrank"); session.connect();
-		 * 
-		 * Channel channel = session.openChannel("sftp"); channel.connect();
-		 * ChannelSftp sftpChannel = (ChannelSftp) channel; String d = sftpChannel.getHome(); Log.d("jscj", d);
-		 * //sftpChannel.get("remotefile.txt", "localfile.txt");
-		 * sftpChannel.exit(); session.disconnect(); } catch (JSchException e) {
-		 * e.printStackTrace(); //To change body of catch statement use File |
-		 * Settings | File Templates. } catch (SftpException e) {
-		 * e.printStackTrace(); } finally{
-		 * 
-		 * }
-		 */
+		ConnectAndLogin();
 	}
 
-	
-	public void createDummyFile() {
-		try {
-			FileOutputStream fos;
-			String file_content = "Hi this is a sample new file to upload for android FTP client example";
+	public void ConnectAndLogin() {
+		new Thread(new Runnable() {
+			public void run() {
 
-			fos = openFileOutput(TEMP_FILENAME, MODE_PRIVATE);
-			fos.write(file_content.getBytes());
-			fos.close();
+				try {
+					jsch = new JSch();
+					session = jsch.getSession(SFTPUSER, SFTPHOST, SFTPPORT);
+					session.setPassword(SFTPPASS);
+					java.util.Properties config = new java.util.Properties();
+					config.put("StrictHostKeyChecking", "no");
+					session.setConfig(config);
+					session.connect(); // crash here!
+					channel = session.openChannel("sftp");
+					channel.connect();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+					channelSftp = (ChannelSftp) channel;
+
+					SFTPWORKINGDIR = channelSftp.getHome();
+					channelSftp.cd(SFTPWORKINGDIR);
+					System.out.println(channelSftp.getHome());
+					// channelSftp.get("remotefile.txt", "localfile.txt");
+					// File f = new File(FILETOTRANSFER);
+					// channelSftp.put(new FileInputStream(f), f.getName());
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+
+			}
+		}).start();
 
 	}
-	
+
+	private void Disconnect() {
+		channelSftp.exit();
+		session.disconnect();
+		Intent i = new Intent(Sftp.this, MainActivity.class);
+		startActivity(i);
+	}
+
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.disconnectstp:
+			Disconnect();
+			Log.d("guirehgreu" , "edfewfrefgrewgtrwgtrw");
+			break;
+		}
+	}
+
 }
