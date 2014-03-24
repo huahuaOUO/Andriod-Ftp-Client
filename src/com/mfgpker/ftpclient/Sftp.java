@@ -30,8 +30,8 @@ public class Sftp extends Activity implements OnClickListener {
 
 	String SFTPHOST = "192.168.1.129";
 	int SFTPPORT = 22;
-	String SFTPUSER = "frank";
-	String SFTPPASS = "blankrank";
+	String SFTPUSER = "";
+	String SFTPPASS = "";
 	String SFTPWORKINGDIR;// = "/home/frank/";
 
 	Button disc;
