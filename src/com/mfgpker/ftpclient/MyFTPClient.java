@@ -32,8 +32,10 @@ public class MyFTPClient  {
 			// connecting to the host
 			
 			mFTPClient.connect(host, port);
-			Log.d(TAG, "*REPLY:: " + mFTPClient.getReplyString());
 			replay =  mFTPClient.getReplyString();
+			Log.d(TAG, "*REPLY:: " + replay);
+			
+			replay = replay.substring(4, replay.length());
 			// now check the reply code, if positive mean connection success
 			if (FTPReply.isPositiveCompletion(mFTPClient.getReplyCode())) {
 				// login using username & password
@@ -239,7 +241,7 @@ public class MyFTPClient  {
 			// if (ftpChangeDirectory(desDirectory)) {
 			status = mFTPClient.storeFile(desFileName, srcFileStream);
 			// }
-
+			
 			srcFileStream.close();
 			return status;
 		} catch (Exception e) {
