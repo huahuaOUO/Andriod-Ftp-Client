@@ -5,4 +5,10 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 
+    
+    <string-array name="connection_protocol_array">
+        <item>FTP - File Transfer Protocol</item>
+        <item>SFTP - SSH File Transfer Protocol</item>
+    </string-array>
+    
 </resources>

@@ -13,11 +13,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener, OnItemSelectedListener {
 
 	TextView ip, port, username, password;
 
@@ -38,6 +42,17 @@ public class MainActivity extends Activity implements OnClickListener {
 			Toast.makeText(MainActivity.this, res, Toast.LENGTH_LONG).show();
 
 		}
+
+		Spinner spinner = (Spinner) findViewById(R.id.connection_protocol);
+		// Create an ArrayAdapter using the string array and a default spinner
+		// layout
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.connection_protocol_array, android.R.layout.simple_spinner_item);
+		// Specify the layout to use when the list of choices appears
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Apply the adapter to the spinner
+		spinner.setAdapter(adapter);
+		spinner.setOnItemSelectedListener(this);
+
 	}
 
 	public void onClick(View v) {
@@ -64,4 +79,12 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	}
 
+	public void onItemSelected(AdapterView<?> av, View v, int pos, long id) {
+
 	}
+
+	public void onNothingSelected(AdapterView<?> arg0) {
+
+	}
+
+}
