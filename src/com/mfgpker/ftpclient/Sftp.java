@@ -28,11 +28,11 @@ public class Sftp extends Activity implements OnClickListener {
 	ChannelSftp channelSftp = null;
 	JSch jsch = null;
 
-	String SFTPHOST = "192.168.1.129";
-	int SFTPPORT = 22;
-	String SFTPUSER = "";
-	String SFTPPASS = "";
-	String SFTPWORKINGDIR;// = "/home/frank/";
+	String SFTPHOST;
+	int SFTPPORT;
+	String SFTPUSER;
+	String SFTPPASS;
+	String SFTPWORKINGDIR;
 
 	Button disc;
 
@@ -41,10 +41,10 @@ public class Sftp extends Activity implements OnClickListener {
 		setContentView(R.layout.sftp);
 
 		Bundle gotBasket = getIntent().getExtras();
-		// SFTPHOST = gotBasket.getString("ip");
-		// SFTPPORT = Integer.parseInt(gotBasket.getString("port"));
-		// SFTPUSER = gotBasket.getString("user");
-		// SFTPPASS = gotBasket.getString("pass");
+		SFTPHOST = gotBasket.getString("ip");
+		SFTPPORT = Integer.parseInt(gotBasket.getString("port"));
+		SFTPUSER = gotBasket.getString("user");
+		SFTPPASS = gotBasket.getString("pass");
 
 		disc = (Button) findViewById(R.id.disconnectstp);
 		disc.setOnClickListener(this);
