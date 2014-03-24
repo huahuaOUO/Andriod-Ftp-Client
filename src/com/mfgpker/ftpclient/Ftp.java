@@ -101,7 +101,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			for (String g : realcontents) {
 				Log.d(TAG, g);
 			}
-			updateList();
+			//updateList();
 			// SimpleAdapter simpleAdpt = new SimpleAdapter(Ftp.this,
 			// realcontents, R.id.contentList);
 			// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
@@ -182,6 +182,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				Log.d(TAG, "Done----------------------------Done");
 				Log.d(TAG, "*realcontents, length: " + realcontents.size());
 				yolo = true;
+				//updateList();
 			}
 		}.start();
 	}
@@ -191,6 +192,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		getContent();
 		while (!yolo) {
 		}
+		
 		Log.d(TAG, "yolo is " + yolo);
 		contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
 		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
@@ -259,7 +261,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				btnUpload.setEnabled(true);
 				btnContent.setEnabled(true);
 
-				// getContent();
+				//getContent();
 				updateList();
 
 			} else {
