@@ -21,6 +21,7 @@
 	    android:layout_toRightOf="@+id/etIP"
 	    android:hint="port"
 	    android:text="800"
+	    android:inputType="textPhonetic"
 	    android:ems="10" />
 
 	<EditText
