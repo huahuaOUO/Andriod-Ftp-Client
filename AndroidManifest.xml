@@ -26,6 +26,9 @@
          <activity
             android:name=".Ftp"
             android:label="FTP" >
+        </activity> <activity
+            android:name=".Sftp"
+            android:label="SFTP" >
         </activity>
     </application>
 

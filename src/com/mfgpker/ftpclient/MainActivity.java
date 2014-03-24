@@ -11,6 +11,7 @@ package com.mfgpker.ftpclient;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -24,6 +25,13 @@ import android.widget.Toast;
 public class MainActivity extends Activity implements OnClickListener, OnItemSelectedListener {
 
 	TextView ip, port, username, password;
+	String TAG = "MainActivity";
+
+	private enum Mode {
+		FTP, SFTP
+	}
+
+	private Mode mode = Mode.FTP;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,9 +78,18 @@ public class MainActivity extends Activity implements OnClickListener, OnItemSel
 			basket.putString("port", port);
 			basket.putString("user", user);
 			basket.putString("pass", pass);
-			Intent i = new Intent(MainActivity.this, Ftp.class);
-			i.putExtras(basket);
-			startActivity(i);
+			Intent i;
+			if(mode == Mode.FTP){
+				i = new Intent(MainActivity.this, Ftp.class);
+				i.putExtras(basket);
+				startActivity(i);
+			}
+			else if (mode == Mode.SFTP){
+				i = new Intent(MainActivity.this, Sftp.class);
+				i.putExtras(basket);
+				startActivity(i);
+			}
+			
 			break;
 
 		}
@@ -80,7 +97,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemSel
 	}
 
 	public void onItemSelected(AdapterView<?> av, View v, int pos, long id) {
-
+		mode = (pos == 0) ? Mode.FTP : Mode.SFTP;
+		Log.d(TAG, mode.toString());
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {
