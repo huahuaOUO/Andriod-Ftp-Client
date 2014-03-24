@@ -10,7 +10,9 @@ package com.mfgpker.ftpclient;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -41,6 +43,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	private String ip, user, pass, port;
 	private ListView contentList;
 	private List<String> realcontents = new ArrayList<String>();
+	Map<String,String> userMap = new HashMap<String,String>();
 	private Button btnUpload, btnDisconnect, btnContent;
 
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +106,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			for (String g : realcontents) {
 				Log.d(TAG, g);
 			}
+			updateList();
 			//updateList();
 			// SimpleAdapter simpleAdpt = new SimpleAdapter(Ftp.this,
 			// realcontents, R.id.contentList);
@@ -118,8 +122,17 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	}
 
 	public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
-		Log.d(TAG, realcontents.get(pos));
+		String cont = realcontents.get(pos).toString();
+		String type = userMap.get(cont);
+		Log.d(TAG, type + ": " + cont);
+		if(type.equals("dir")){
+			new ChangeDir().execute(cont);
+		} else if (type.equals("file")){
+			
+		}
+		
 	}
+
 
 	private void logout() {
 		realcontents.clear();
@@ -163,6 +176,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		new Thread("contentThread") {
 			public void run() {
 				realcontents.clear();
+				userMap.clear();
 				String[] contents;
 
 				// ftpclient.ftpPrintFilesList(workingDir);
@@ -175,9 +189,11 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					if (con.startsWith("file:")) {
 						con = con.substring(5);
 						Log.d(TAG, "file: " + con);
+						userMap.put(con, "file");
 					} else {
 						con = con.substring(10) + "/";
 						Log.d(TAG, "dir: " + con);
+						userMap.put(con, "dir");
 					}
 					realcontents.add(con);
 				}
@@ -200,6 +216,11 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
 
+	
+	public void onBackPressed (){
+		new ChangeDir().execute("../");
+	}
+	
 	public class Login extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog dialog;
@@ -278,4 +299,27 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
+	
+	public class ChangeDir extends AsyncTask<String, Integer, String> {
+
+		protected void onPreExecute() {
+
+		}
+
+		protected String doInBackground(String... args) {
+			ftpclient.ftpChangeDirectory(args[0]);
+			workingDir = ftpclient.ftpGetCurrentWorkingDirectory();
+			
+			Log.d(TAG, "ChangeDir");
+			return "";
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+		}
+
+		protected void onPostExecute(String result) {
+			updateList();
+		}
+	}
+	
 }
