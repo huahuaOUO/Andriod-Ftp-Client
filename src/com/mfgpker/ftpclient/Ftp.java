@@ -8,11 +8,14 @@
  */
 package com.mfgpker.ftpclient;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +30,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -122,7 +126,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		if(type.equals("dir")){
 			new ChangeDir().execute(cont);
 		} else if (type.equals("file")){
-			
+			new DownloadFile().execute(cont,  Environment.getExternalStorageDirectory().getPath());
 		}
 		
 	}
@@ -391,6 +395,24 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 	
+	/* Checks if external storage is available for read and write */
+	public boolean isExternalStorageWritable() {
+	    String state = Environment.getExternalStorageState();
+	    if (Environment.MEDIA_MOUNTED.equals(state)) {
+	        return true;
+	    }
+	    return false;
+	}
+
+	/* Checks if external storage is available to at least read */
+	public boolean isExternalStorageReadable() {
+	    String state = Environment.getExternalStorageState();
+	    if (Environment.MEDIA_MOUNTED.equals(state) ||
+	        Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+	        return true;
+	    }
+	    return false;
+	}
 	
 	public class UploadFile extends AsyncTask<String, Integer, String> {
 
@@ -451,4 +473,73 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 	
+	public class DownloadFile extends AsyncTask<String, Integer, String> {
+
+		protected void onPreExecute() {
+
+		}
+
+		protected String doInBackground(String... args) {
+			boolean status = false;
+			String name = args[0];
+			String path = args[1];
+			Log.d(TAG, name);
+			
+			System.out.println(name);
+			//status = ftpclient.ftpDownload(name, path+"/");
+			String s = workingDir.equals("/")? "" : workingDir;
+			System.out.println(s);
+			try {
+				
+				InputStream is =  ftpclient.mFTPClient.retrieveFileStream(name);
+				if(is != null){
+				System.out.println("is: " + is);
+				String isst = convertStreamToString(is);
+				System.out.println("isst: " + isst);
+				is.close();
+				Log.d(TAG, "content: " + isst);
+				ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+				FileOutputStream fous = openFileOutput(name, Context.MODE_WORLD_WRITEABLE);
+				fous.write(isst.getBytes());
+				fous.close();
+				} else {
+					Log.d(TAG, "inputstream is null");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (status == true) {
+				Log.d(TAG, "Download success");
+			} else {
+				Log.e(TAG, "Download failed");
+
+			}
+			return "";
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+		}
+
+		protected void onPostExecute(String result) {
+			//updateList();
+		}
+	}
+	
+	public static String convertStreamToString(InputStream is) throws Exception {
+	    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+	    StringBuilder sb = new StringBuilder();
+	    String line = null;
+
+	    while ((line = reader.readLine()) != null) {
+	        sb.append(line);
+	    }
+
+	    is.close();
+	    reader.close();
+	    
+
+	    return sb.toString();
+	}
 }
