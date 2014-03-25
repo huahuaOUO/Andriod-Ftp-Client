@@ -8,7 +8,12 @@
  */
 package com.mfgpker.ftpclient;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +23,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -76,6 +83,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 		if(port.isEmpty()) port = "21";
 		
+		//finishActivity(0);
+		
 		new Login().execute(ip, port, user, pass);
 		// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
 		// android.R.layout.simple_list_item_1, realcontents));
@@ -85,22 +94,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		switch (v.getId()) {
 
 		case R.id.upload:
-			new Thread(new Runnable() {
-				public void run() {
-					boolean status = false;
-					status = ftpclient.ftpUpload(TEMP_FILENAME, TEMP_FILENAME, "/", cntx);
-					if (status == true) {
-						Log.d(TAG, "Upload success");
-						// Toast.makeText(MainActivity.this,"Upload success.",
-						// Toast.LENGTH_LONG).show();
-					} else {
-						Log.e(TAG, "Upload failed");
-
-						// Toast.makeText(MainActivity.this, "Upload failed.",
-						// Toast.LENGTH_LONG).show();
-					}
-				}
-			}).start();
+			showFileChooser();
 			break;
 		case R.id.getContent:
 			for (String g : realcontents) {
@@ -133,6 +127,75 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		
 	}
 
+	
+	private static final int FILE_SELECT_CODE = 0;
+
+	private void showFileChooser() {
+	    Intent intent = new Intent(Intent.ACTION_GET_CONTENT); 
+	    intent.setType("*/*"); 
+	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+	    try {
+	        startActivityForResult(
+	                Intent.createChooser(intent, "Select a File to Upload"),
+	                FILE_SELECT_CODE);
+	    } catch (android.content.ActivityNotFoundException ex) {
+	        // Potentially direct the user to the Market with a Dialog
+	        Toast.makeText(this, "Please install a File Manager.", 
+	                Toast.LENGTH_SHORT).show();
+	    }
+	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    switch (requestCode) {
+	        case FILE_SELECT_CODE:
+	        if (resultCode == RESULT_OK) {
+	            // Get the Uri of the selected file 
+	            Uri uri = data.getData();
+	            Log.d(TAG, "File Uri: " + uri.toString());
+	            // Get the path
+	            String path;
+				try {
+					path = getPath(this, uri);
+					File fil = new File(path);
+					String name = fil.getName();
+					System.out.println(fil.exists());
+					new UploadFile().execute(path, name);
+					 Log.d(TAG, "File Path: " + path + ", name: " + name);
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+	           
+	            // Get the file instance
+	            // File file = new File(path);
+	            // Initiate the upload
+	        }
+	        break;
+	    }
+	    super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	public static String getPath(Context context, Uri uri) throws URISyntaxException {
+	    if ("content".equalsIgnoreCase(uri.getScheme())) {
+	        String[] projection = { "_data" };
+	        Cursor cursor = null;
+
+	        try {
+	            cursor = context.getContentResolver().query(uri, projection, null, null, null);
+	            int column_index = cursor.getColumnIndexOrThrow("_data");
+	            if (cursor.moveToFirst()) {
+	                return cursor.getString(column_index);
+	            }
+	        } catch (Exception e) {
+	            // Eat it
+	        }
+	    }
+	    else if ("file".equalsIgnoreCase(uri.getScheme())) {
+	        return uri.getPath();
+	    }
+
+	    return null;
+	} 
 
 	private void logout() {
 		realcontents.clear();
@@ -325,6 +388,66 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 		protected void onPostExecute(String result) {
 			updateList();
+		}
+	}
+	
+	
+	public class UploadFile extends AsyncTask<String, Integer, String> {
+
+		protected void onPreExecute() {
+
+		}
+
+		protected String doInBackground(String... args) {
+			boolean status = false;
+			String path = args[0];
+			Log.d(TAG, path);
+			String name = args[1];
+			Log.d(TAG, name);
+			
+			File f = new File(path);
+			System.out.println("ph: " + f.getPath());	
+			System.out.println("getAbsolutePath: " + f.getAbsolutePath());	
+			System.out.println("findes den: " + f.exists());	
+			System.out.println("read: " + f.canRead());
+			System.out.println("write: " + f.canWrite());
+			String abspath = f.getAbsolutePath();
+			
+			status = ftpclient.ftpUpload(abspath, abspath, workingDir, cntx);
+			
+			//ftpclient.mFTPClient.
+			/*try {
+			 FileInputStream srcFileStream = cntx.openFileInput(path);
+				status = ftpclient.mFTPClient.storeFile(path, srcFileStream);
+				srcFileStream.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+			*/
+
+			// change working directory to the destination directory
+			// if (ftpChangeDirectory(desDirectory)) {
+			 
+			// }
+			
+			
+			
+			if (status == true) {
+				Log.d(TAG, "Upload success");
+			} else {
+				Log.e(TAG, "Upload failed");
+
+			}
+			return "";
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+		}
+
+		protected void onPostExecute(String result) {
+			//updateList();
 		}
 	}
 	
