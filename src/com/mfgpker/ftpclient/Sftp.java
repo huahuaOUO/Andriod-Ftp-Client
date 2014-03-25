@@ -42,7 +42,8 @@ public class Sftp extends Activity implements OnClickListener {
 
 		Bundle gotBasket = getIntent().getExtras();
 		SFTPHOST = gotBasket.getString("ip");
-		SFTPPORT = Integer.parseInt(gotBasket.getString("port"));
+		String port = gotBasket.getString("port");
+		SFTPPORT = Integer.parseInt(port.isEmpty()? "22" : port);
 		SFTPUSER = gotBasket.getString("user");
 		SFTPPASS = gotBasket.getString("pass");
 
@@ -90,6 +91,7 @@ public class Sftp extends Activity implements OnClickListener {
 		session.disconnect();
 		Intent i = new Intent(Sftp.this, MainActivity.class);
 		startActivity(i);
+		this.finish();
 	}
 
 	public void onClick(View v) {

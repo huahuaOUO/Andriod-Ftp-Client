@@ -12,7 +12,7 @@
     <string name="pass">Password</string>
     <string name="save_info">Save info</string>
     
-    <string name="get_Content">Get Content</string>
+    <string name="get_Content">Refresh</string>
     <string name="upload">Upload file to ftp</string>
     <string name="disconnect">Disconnect</string>
     
