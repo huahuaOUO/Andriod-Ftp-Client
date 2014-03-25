@@ -34,7 +34,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	MyFTPClient ftpclient;
 
-	String workingDir;
+	String workingDir, orginalDir;
 	private static final String TAG = "MainActivity";
 	private static final String TEMP_FILENAME = "test.txt";
 
@@ -138,6 +138,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		realcontents.clear();
 		Intent i = new Intent(Ftp.this, MainActivity.class);
 		startActivity(i);
+		this.finish();
+		Log.d(TAG, "BYE BYE");
 	}
 
 	void Disconnect() {
@@ -218,7 +220,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	
 	public void onBackPressed (){
-		new ChangeDir().execute("../");
+		if(!workingDir.equals(orginalDir)){
+			new ChangeDir().execute("../");
+		}
+		
 	}
 	
 	public class Login extends AsyncTask<String, Integer, String> {
@@ -253,6 +258,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					// status = ftpclient.ftpUpload(TEMP_FILENAME,
 					// TEMP_FILENAME, "/", cntx);
 					workingDir = ftpclient.ftpGetCurrentWorkingDirectory();
+					orginalDir = workingDir;
 					res = "true";
 				} else {
 					// Toast.makeText(getApplicationContext(),
@@ -286,7 +292,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 				//getContent();
 				updateList();
-
+				Log.d(TAG, "worksdir: " + workingDir);
 			} else {
 				Disconnect();
 				Intent i = new Intent(Ftp.this, MainActivity.class);

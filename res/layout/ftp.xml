@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="Get Content" />
+        android:text="@string/get_Content" />
 
     <Button
         android:id="@+id/upload"
@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:text="Upload file to ftp" />
+        android:text="@string/upload" />
 
     <Button
         android:id="@+id/disconnect"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="Disconnect" />
+        android:text="@string/disconnect" />
 
     <ListView
         android:id="@+id/contentList"

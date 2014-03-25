@@ -9,7 +9,7 @@
             android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login to server" />
+            android:text="@string/login" />
 
 	<EditText
 	    android:id="@+id/etPort"
@@ -19,7 +19,7 @@
 	    android:layout_alignBottom="@+id/etIP"
 	    android:layout_alignParentRight="true"
 	    android:layout_toRightOf="@+id/etIP"
-	    android:hint="port"
+	    android:hint="@string/port"
 	    android:text="800"
 	    android:inputType="number"
 	    android:ems="10" />
@@ -30,7 +30,7 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
 	    android:layout_below="@+id/login"
-	    android:hint="Ip"
+	    android:hint="@string/ip"
 	    android:text="192.168.1.121"
 	    android:ems="10" />
 
@@ -42,7 +42,7 @@
 	    android:layout_below="@+id/etPort"
 	    android:layout_marginTop="24dp"
 	    android:ems="10"
-	    android:text="bob"
+	    android:text="@string/user"
 	    android:hint="username" >
 
 	    <requestFocus />
@@ -56,7 +56,7 @@
 	    android:layout_alignParentRight="true"
 	    android:layout_below="@+id/etusername"
 	    android:layout_marginTop="18dp"
-	    android:hint="Password"
+	    android:hint="@string/pass"
 	    android:ems="10"
 	    android:text="frank"
 	    android:inputType="textPassword" />
@@ -67,7 +67,7 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
 	    android:layout_below="@+id/etpassword"
-	    android:text="Save info" />
+	    android:text="@string/save_info" />
 
 	<Spinner
 	    android:id="@+id/connection_protocol"
