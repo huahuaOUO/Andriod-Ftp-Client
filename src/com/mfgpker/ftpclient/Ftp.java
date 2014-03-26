@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -54,7 +56,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	private String ip, user, pass, port;
 	private ListView contentList;
 	private List<String> realcontents = new ArrayList<String>();
-	Map<String,String> userMap = new HashMap<String,String>();
+	Map<String, String> userMap = new HashMap<String, String>();
 	private Button btnUpload, btnDisconnect, btnContent;
 
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,10 +87,11 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		user = gotBasket.getString("user");
 		pass = gotBasket.getString("pass");
 
-		if(port.isEmpty()) port = "21";
-		
-		//finishActivity(0);
-		
+		if (port.isEmpty())
+			port = "21";
+
+		// finishActivity(0);
+
 		new Login().execute(ip, port, user, pass);
 		// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
 		// android.R.layout.simple_list_item_1, realcontents));
@@ -105,7 +108,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				Log.d(TAG, g);
 			}
 			updateList();
-			//updateList();
+			// updateList();
 			// SimpleAdapter simpleAdpt = new SimpleAdapter(Ftp.this,
 			// realcontents, R.id.contentList);
 			// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
@@ -123,83 +126,78 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		String cont = realcontents.get(pos).toString();
 		String type = userMap.get(cont);
 		Log.d(TAG, type + ": " + cont);
-		if(type.equals("dir")){
+		if (type.equals("dir")) {
 			new ChangeDir().execute(cont);
-		} else if (type.equals("file")){
-			new DownloadFile().execute(cont,  Environment.getExternalStorageDirectory().getPath());
+		} else if (type.equals("file")) {
+			new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
 		}
-		
+
 	}
 
-	
 	private static final int FILE_SELECT_CODE = 0;
 
 	private void showFileChooser() {
-	    Intent intent = new Intent(Intent.ACTION_GET_CONTENT); 
-	    intent.setType("*/*"); 
-	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-	    try {
-	        startActivityForResult(
-	                Intent.createChooser(intent, "Select a File to Upload"),
-	                FILE_SELECT_CODE);
-	    } catch (android.content.ActivityNotFoundException ex) {
-	        // Potentially direct the user to the Market with a Dialog
-	        Toast.makeText(this, "Please install a File Manager.", 
-	                Toast.LENGTH_SHORT).show();
-	    }
+		try {
+			startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+		} catch (android.content.ActivityNotFoundException ex) {
+			// Potentially direct the user to the Market with a Dialog
+			Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
+		}
 	}
-	
+
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    switch (requestCode) {
-	        case FILE_SELECT_CODE:
-	        if (resultCode == RESULT_OK) {
-	            // Get the Uri of the selected file 
-	            Uri uri = data.getData();
-	            Log.d(TAG, "File Uri: " + uri.toString());
-	            // Get the path
-	            String path;
+		switch (requestCode) {
+		case FILE_SELECT_CODE:
+			if (resultCode == RESULT_OK) {
+				// Get the Uri of the selected file
+				Uri uri = data.getData();
+				Log.d(TAG, "File Uri: " + uri.toString());
+				// Get the path
+				String path;
 				try {
 					path = getPath(this, uri);
 					File fil = new File(path);
 					String name = fil.getName();
 					System.out.println(fil.exists());
 					new UploadFile().execute(path, name);
-					 Log.d(TAG, "File Path: " + path + ", name: " + name);
+					Log.d(TAG, "File Path: " + path + ", name: " + name);
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
-	           
-	            // Get the file instance
-	            // File file = new File(path);
-	            // Initiate the upload
-	        }
-	        break;
-	    }
-	    super.onActivityResult(requestCode, resultCode, data);
+
+				// Get the file instance
+				// File file = new File(path);
+				// Initiate the upload
+			}
+			break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	public static String getPath(Context context, Uri uri) throws URISyntaxException {
-	    if ("content".equalsIgnoreCase(uri.getScheme())) {
-	        String[] projection = { "_data" };
-	        Cursor cursor = null;
+		if ("content".equalsIgnoreCase(uri.getScheme())) {
+			String[] projection = { "_data" };
+			Cursor cursor = null;
 
-	        try {
-	            cursor = context.getContentResolver().query(uri, projection, null, null, null);
-	            int column_index = cursor.getColumnIndexOrThrow("_data");
-	            if (cursor.moveToFirst()) {
-	                return cursor.getString(column_index);
-	            }
-	        } catch (Exception e) {
-	            // Eat it
-	        }
-	    }
-	    else if ("file".equalsIgnoreCase(uri.getScheme())) {
-	        return uri.getPath();
-	    }
+			try {
+				cursor = context.getContentResolver().query(uri, projection, null, null, null);
+				int column_index = cursor.getColumnIndexOrThrow("_data");
+				if (cursor.moveToFirst()) {
+					return cursor.getString(column_index);
+				}
+			} catch (Exception e) {
+				// Eat it
+			}
+		} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+			return uri.getPath();
+		}
 
-	    return null;
-	} 
+		return null;
+	}
 
 	private void logout() {
 		realcontents.clear();
@@ -269,7 +267,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				Log.d(TAG, "Done----------------------------Done");
 				Log.d(TAG, "*realcontents, length: " + realcontents.size());
 				yolo = true;
-				//updateList();
+				// updateList();
 			}
 		}.start();
 	}
@@ -279,20 +277,19 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		getContent();
 		while (!yolo) {
 		}
-		
+
 		Log.d(TAG, "yolo is " + yolo);
 		contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
 		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
 
-	
-	public void onBackPressed (){
-		if(!workingDir.equals(orginalDir)){
+	public void onBackPressed() {
+		if (!workingDir.equals(orginalDir)) {
 			new ChangeDir().execute("../");
 		}
-		
+
 	}
-	
+
 	public class Login extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog dialog;
@@ -357,7 +354,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				btnUpload.setEnabled(true);
 				btnContent.setEnabled(true);
 
-				//getContent();
+				// getContent();
 				updateList();
 				Log.d(TAG, "worksdir: " + workingDir);
 			} else {
@@ -372,7 +369,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
-	
 	public class ChangeDir extends AsyncTask<String, Integer, String> {
 
 		protected void onPreExecute() {
@@ -382,7 +378,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		protected String doInBackground(String... args) {
 			ftpclient.ftpChangeDirectory(args[0]);
 			workingDir = ftpclient.ftpGetCurrentWorkingDirectory();
-			
+
 			Log.d(TAG, "ChangeDir");
 			return "";
 		}
@@ -394,26 +390,25 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			updateList();
 		}
 	}
-	
+
 	/* Checks if external storage is available for read and write */
 	public boolean isExternalStorageWritable() {
-	    String state = Environment.getExternalStorageState();
-	    if (Environment.MEDIA_MOUNTED.equals(state)) {
-	        return true;
-	    }
-	    return false;
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			return true;
+		}
+		return false;
 	}
 
 	/* Checks if external storage is available to at least read */
 	public boolean isExternalStorageReadable() {
-	    String state = Environment.getExternalStorageState();
-	    if (Environment.MEDIA_MOUNTED.equals(state) ||
-	        Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-	        return true;
-	    }
-	    return false;
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+			return true;
+		}
+		return false;
 	}
-	
+
 	public class UploadFile extends AsyncTask<String, Integer, String> {
 
 		protected void onPreExecute() {
@@ -426,36 +421,31 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			Log.d(TAG, path);
 			String name = args[1];
 			Log.d(TAG, name);
-			
+
 			File f = new File(path);
-			System.out.println("ph: " + f.getPath());	
-			System.out.println("getAbsolutePath: " + f.getAbsolutePath());	
-			System.out.println("findes den: " + f.exists());	
+			System.out.println("ph: " + f.getPath());
+			System.out.println("getAbsolutePath: " + f.getAbsolutePath());
+			System.out.println("findes den: " + f.exists());
 			System.out.println("read: " + f.canRead());
 			System.out.println("write: " + f.canWrite());
 			String abspath = f.getAbsolutePath();
-			
+
 			status = ftpclient.ftpUpload(abspath, abspath, workingDir, cntx);
-			
-			//ftpclient.mFTPClient.
-			/*try {
-			 FileInputStream srcFileStream = cntx.openFileInput(path);
-				status = ftpclient.mFTPClient.storeFile(path, srcFileStream);
-				srcFileStream.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}catch (IOException e) {
-				e.printStackTrace();
-			}
-			*/
+
+			// ftpclient.mFTPClient.
+			/*
+			 * try { FileInputStream srcFileStream = cntx.openFileInput(path);
+			 * status = ftpclient.mFTPClient.storeFile(path, srcFileStream);
+			 * srcFileStream.close(); } catch (FileNotFoundException e) {
+			 * e.printStackTrace(); }catch (IOException e) {
+			 * e.printStackTrace(); }
+			 */
 
 			// change working directory to the destination directory
 			// if (ftpChangeDirectory(desDirectory)) {
-			 
+
 			// }
-			
-			
-			
+
 			if (status == true) {
 				Log.d(TAG, "Upload success");
 			} else {
@@ -469,10 +459,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		protected void onPostExecute(String result) {
-			//updateList();
+			// updateList();
 		}
 	}
-	
+
 	public class DownloadFile extends AsyncTask<String, Integer, String> {
 
 		protected void onPreExecute() {
@@ -482,26 +472,28 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		protected String doInBackground(String... args) {
 			boolean status = false;
 			String name = args[0];
-			String path = args[1];
 			Log.d(TAG, name);
-			
+
 			System.out.println(name);
-			//status = ftpclient.ftpDownload(name, path+"/");
-			String s = workingDir.equals("/")? "" : workingDir;
+			// status = ftpclient.ftpDownload(name, path+"/");
+			String s = workingDir.equals("/") ? "" : workingDir;
 			System.out.println(s);
 			try {
-				
-				InputStream is =  ftpclient.mFTPClient.retrieveFileStream(name);
-				if(is != null){
-				System.out.println("is: " + is);
-				String isst = convertStreamToString(is);
-				System.out.println("isst: " + isst);
-				is.close();
-				Log.d(TAG, "content: " + isst);
-				ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
-				FileOutputStream fous = openFileOutput(name, Context.MODE_WORLD_WRITEABLE);
-				fous.write(isst.getBytes());
-				fous.close();
+
+				InputStream is = ftpclient.mFTPClient.retrieveFileStream(name);
+				if (is != null) {
+					// System.out.println("is: " + is);
+					// String isst = convertStreamToString(is);
+					// System.out.println("isst: " + isst);
+					byte[] bytes = IOUtils.toByteArray(is);
+					is.close();
+					// Log.d(TAG, "content: " + isst);
+					Log.d(TAG, "content: " + new String(bytes));
+					ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+					FileOutputStream fous = openFileOutput(name, Context.MODE_WORLD_WRITEABLE);
+					fous.write(bytes);
+					fous.close();
+
 				} else {
 					Log.d(TAG, "inputstream is null");
 				}
@@ -523,23 +515,49 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		protected void onPostExecute(String result) {
-			//updateList();
+			// updateList();
 		}
 	}
-	
+
 	public static String convertStreamToString(InputStream is) throws Exception {
-	    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-	    StringBuilder sb = new StringBuilder();
-	    String line = null;
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+		String line = null;
 
-	    while ((line = reader.readLine()) != null) {
-	        sb.append(line);
-	    }
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+		}
 
-	    is.close();
-	    reader.close();
-	    
+		is.close();
+		reader.close();
 
-	    return sb.toString();
+		return sb.toString();
 	}
+
+	private String Readfile(String name) {
+		String ret = "";
+		try {
+			InputStream gg = openFileInput(name);
+			if (gg != null) {
+				InputStreamReader inputStreamReader = new InputStreamReader(gg);
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+				String receiveString = "";
+				StringBuilder stringBuilder = new StringBuilder();
+
+				while ((receiveString = bufferedReader.readLine()) != null) {
+					stringBuilder.append(receiveString);
+				}
+
+				gg.close();
+				ret = stringBuilder.toString();
+				Log.d(TAG, "*Content: " + ret);
+			}
+		} catch (FileNotFoundException e) {
+			Log.e("login activity", "File not found: " + e.toString());
+		} catch (IOException e) {
+			Log.e("login activity", "Can not read file: " + e.toString());
+		}
+		return ret;
+	}
+
 }
