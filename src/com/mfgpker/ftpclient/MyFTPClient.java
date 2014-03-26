@@ -8,8 +8,12 @@
  */
 package com.mfgpker.ftpclient;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -17,30 +21,32 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
-public class MyFTPClient  {
+public class MyFTPClient {
 	// Now, declare a public FTP client object.
 
 	private static final String TAG = "MyFTPClient";
 	public FTPClient mFTPClient = null;
 	static public String replay;
+
 	// Method to connect to FTP server:
 	public boolean ftpConnect(String host, String username, String password, int port) {
 		try {
 			mFTPClient = new FTPClient();
 			// connecting to the host
-			
+
 			mFTPClient.connect(host, port);
-			replay =  mFTPClient.getReplyString();
+			replay = mFTPClient.getReplyString();
 			Log.d(TAG, "*REPLY:: " + replay);
-			
+
 			replay = replay.substring(4, replay.length());
 			// now check the reply code, if positive mean connection success
 			if (FTPReply.isPositiveCompletion(mFTPClient.getReplyCode())) {
 				// login using username & password
 				boolean status = mFTPClient.login(username, password);
-				
+
 				/*
 				 * Set File Transfer Mode
 				 * 
@@ -51,7 +57,7 @@ public class MyFTPClient  {
 				 */
 				mFTPClient.setFileType(FTP.ASCII_FILE_TYPE);
 				mFTPClient.enterLocalPassiveMode();
-				
+
 				return status;
 			}
 		} catch (Exception e) {
@@ -122,7 +128,6 @@ public class MyFTPClient  {
 		}
 	}
 
-	
 	public String[] getContentList(String dir_path) {
 		String[] content;
 		try {
@@ -132,7 +137,7 @@ public class MyFTPClient  {
 			for (int i = 0; i < length; i++) {
 				String name = ftpFiles[i].getName();
 				boolean isFile = ftpFiles[i].isFile();
-				
+
 				if (isFile) {
 					content[i] = "file:" + name;
 				} else {
@@ -145,7 +150,7 @@ public class MyFTPClient  {
 		}
 		return null;
 	}
-	
+
 	// Method to create new directory:
 
 	public boolean ftpMakeDirectory(String new_dir_path) {
@@ -206,18 +211,47 @@ public class MyFTPClient  {
 	 * srcFilePath: path to the source file in FTP server desFilePath: path to
 	 * the destination file to be saved in sdcard
 	 */
-	public boolean ftpDownload(String srcFilePath, String desFilePath) {
+	public boolean ftpDownload(String name, String srcFilePath, String desFilePath) {
 		boolean status = false;
+		// create folder..
 		try {
-			FileOutputStream desFileStream = new FileOutputStream(desFilePath);
-			
-			status = mFTPClient.retrieveFile(srcFilePath, desFileStream);
-			desFileStream.close();
-
-			return status;
+			File newFolder = new File(Environment.getExternalStorageDirectory(), "ftp-clients-downloads");
+			if (!newFolder.exists()) {
+				newFolder.mkdir();
+			}
+			try {
+				File file = new File(newFolder, name);
+				if (!file.exists())
+					file.createNewFile();
+				FileOutputStream fos;
+				try {
+					fos = new FileOutputStream(file);
+					status = mFTPClient.retrieveFile(name, fos);
+					fos.flush();
+					fos.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					Log.e(TAG, ".download failed");
+				}
+			} catch (Exception ex) {
+				System.out.println("ex: " + ex);
+				Log.e(TAG, "download failed");
+			}
 		} catch (Exception e) {
+			System.out.println("e: " + e);
 			Log.e(TAG, "download failed");
 		}
+
+		/*
+		 * try { FileOutputStream desFileStream = new
+		 * FileOutputStream(desFilePath);
+		 * 
+		 * 
+		 * desFileStream.close();
+		 * 
+		 * return status; } catch (Exception e) { Log.e(TAG, "download failed");
+		 * }
+		 */
 
 		return status;
 	}
@@ -235,17 +269,29 @@ public class MyFTPClient  {
 		try {
 			// FileInputStream srcFileStream = new FileInputStream(srcFilePath);
 
-			FileInputStream srcFileStream = context.openFileInput(srcFilePath);
+			// mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+			File file = new File(srcFilePath);
+			InputStream is = null;
+			try {
+				is = new BufferedInputStream(new FileInputStream(file));
 
-			// change working directory to the destination directory
-			// if (ftpChangeDirectory(desDirectory)) {
-			status = mFTPClient.storeFile(desFileName, srcFileStream);
-			// }
-			
-			srcFileStream.close();
+				mFTPClient.enterLocalPassiveMode();
+				mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+				// FileInputStream fis = new FileInputStream(srcFilePath);
+				status = mFTPClient.storeFile(desFileName, is);
+				String error = mFTPClient.getReplyString();
+				System.out.println("status: " + status + ", error: " + error);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				is.close();
+				//status = mFTPClient.completePendingCommand();
+			}
+
+			System.out.println("status*: " + status);
 			return status;
 		} catch (Exception e) {
-			Log.e(TAG, "upload failed: " + e);
+			Log.e(TAG, "***upload failed: " + e);
 		}
 
 		return status;
