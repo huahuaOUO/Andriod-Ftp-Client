@@ -13,9 +13,11 @@
     <string name="save_info">Save info</string>
     
     <string name="get_Content">Refresh</string>
-    <string name="upload">Upload file to ftp</string>
+    <string name="upload">Upload</string>
     <string name="disconnect">Disconnect</string>
     
+     <string name="allowdownload">Is allow to download</string>
+    <string name="allowupload">Is allow to upload</string>
     
 	
 	

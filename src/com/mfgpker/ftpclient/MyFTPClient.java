@@ -30,14 +30,18 @@ public class MyFTPClient {
 	private static final String TAG = "MyFTPClient";
 	public FTPClient mFTPClient = null;
 	static public String replay;
-
+	
+	@SuppressWarnings("unused")
+	private boolean isallowtodownload = false, isallowtoupload = false;
+	
 	// Method to connect to FTP server:
 	public boolean ftpConnect(String host, String username, String password, int port) {
 		try {
 			mFTPClient = new FTPClient();
 			// connecting to the host
-
+			
 			mFTPClient.connect(host, port);
+			
 			replay = mFTPClient.getReplyString();
 			Log.d(TAG, "*REPLY:: " + replay);
 
@@ -46,7 +50,7 @@ public class MyFTPClient {
 			if (FTPReply.isPositiveCompletion(mFTPClient.getReplyCode())) {
 				// login using username & password
 				boolean status = mFTPClient.login(username, password);
-
+				
 				/*
 				 * Set File Transfer Mode
 				 * 
@@ -55,7 +59,7 @@ public class MyFTPClient {
 				 * EBCDIC_FILE_TYPE .etc. Here, I use BINARY_FILE_TYPE for
 				 * transferring text, image, and compressed files.
 				 */
-				mFTPClient.setFileType(FTP.ASCII_FILE_TYPE);
+				mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
 				mFTPClient.enterLocalPassiveMode();
 
 				return status;

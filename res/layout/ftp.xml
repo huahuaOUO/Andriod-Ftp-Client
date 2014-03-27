@@ -36,4 +36,38 @@
 
     </ListView>
 
+    <TextView
+        android:id="@+id/tvsallowdownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/getContent"
+        android:text="@string/allowdownload"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/tvallowupload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/getContent"
+        android:layout_toRightOf="@+id/getContent"
+        android:text="@string/allowupload"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/ivupload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/disconnect"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/red" />
+
+    <ImageView
+        android:id="@+id/ivdownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/contentList"
+        android:layout_alignLeft="@+id/ivupload"
+        android:src="@drawable/red" />
+
 </RelativeLayout>
