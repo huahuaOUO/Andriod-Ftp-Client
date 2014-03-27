@@ -61,7 +61,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	private Context cntx = null;
 
-
 	private String ip, user, pass, port;
 	private ListView contentList;
 	private List<String> realcontents = new ArrayList<String>();
@@ -78,7 +77,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		btnUpload = (Button) findViewById(R.id.upload);
 		btnDisconnect = (Button) findViewById(R.id.disconnect);
 		btnContent = (Button) findViewById(R.id.getContent);
-
 
 		btnDisconnect.setOnClickListener(this);
 		btnUpload.setOnClickListener(this);
@@ -428,71 +426,16 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		protected String doInBackground(String... args) {
 			boolean status = false;
 			String path = args[0];
-			Log.d(TAG, path);
+			Log.d(TAG, "path: " + path);
 			String name = args[1];
-			Log.d(TAG, name);
+			Log.d(TAG, "name: " + name);
 
 			File f = new File(path);
-			System.out.println("name: " + f.getName());
-			System.out.println("ph: " + f.getPath());
-			System.out.println("getAbsolutePath: " + f.getAbsolutePath());
-			String CanonicalPath;
-			try {
-				System.out.println("getCanonicalPath: " + (CanonicalPath = f.getCanonicalPath()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			System.out.println("findes den: " + f.exists());
-			System.out.println("read: " + f.canRead());
-			System.out.println("write: " + f.canWrite());
 			String abspath = f.getAbsolutePath();
-		
+
 			status = ftpclient.ftpUpload(abspath, f.getName(), "/", cntx);
 			int errorcode = ftpclient.mFTPClient.getReplyCode();
 			Log.d(TAG, "Code: " + errorcode);
-			ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
-//			try {
-//				// FileInputStream srcFileStream = new FileInputStream(srcFilePath);
-//
-//				FileInputStream fis = new FileInputStream (new File(TEMP_FILENAME));
-//
-//				OutputStream output;
-//				output = ftpclient.mFTPClient.storeFileStream(name); //storeFile(name, fis);
-//				System.out.println("output: " + output);
-//				int errorcode = ftpclient.mFTPClient.getReplyCode();
-//				Log.d(TAG, "Code: " + errorcode);Util.copyStream(fis, output);
-//				fis.close();
-//				output.close();
-//				if(!ftpclient.mFTPClient.completePendingCommand()){
-//					status = false;
-//				} else status = true;
-//				
-//				// }
-//				
-//				fis.close();
-//				//return status;
-//			} catch (Exception e) {
-//				Log.e(TAG, "*upload failed*: " + e);
-//			} finally{ status = true;}
-//			
-			
-			
-			//FileInputStream fis = new FileInputStream (new File(NAME_OF_FILE));
-			//status = ftpclient.ftpUpload(abspath, abspath, workingDir, cntx);
-
-			// ftpclient.mFTPClient.
-			/*
-			 * try { FileInputStream srcFileStream = cntx.openFileInput(path);
-			 * status = ftpclient.mFTPClient.storeFile(path, srcFileStream);
-			 * srcFileStream.close(); } catch (FileNotFoundException e) {
-			 * e.printStackTrace(); }catch (IOException e) {
-			 * e.printStackTrace(); }
-			 */
-
-			// change working directory to the destination directory
-			// if (ftpChangeDirectory(desDirectory)) {
-
-			// }
 
 			if (status == true) {
 				Log.d(TAG, "Upload success");
@@ -507,7 +450,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		protected void onPostExecute(String result) {
-			// updateList();
+			updateList();
 		}
 	}
 
@@ -516,39 +459,98 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		Bitmap bitmap;
 		String name;
 
-		protected void onPreExecute() {
-
-		}
-
 		protected String doInBackground(String... args) {
 			boolean status = false;
 			name = args[0];
 			String path = args[1];
 			Log.d(TAG, "name: " + name);
 			Log.d(TAG, "path: " + path);
-			// name = "\"" + name + "\"";
-			// name = name.replaceAll(" ", "\\ ");
 			System.out.println(name);
-			// status = ftpclient.ftpDownload(name, name, name);
 
 			String s = workingDir.equals("/") ? "" : workingDir;
 			System.out.println(s);
-
-			if (name.endsWith(".jpg") || name.endsWith(".png")) {
+			
+			
+			
+			if (name.endsWith(".jpg.") || name.endsWith(".png.")) {
 				System.out.println("shoit");
-				DownloadImage(name);
+				try {
+					ftpclient.mFTPClient.enterLocalPassiveMode();
+					ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+					ftpclient.mFTPClient.setControlKeepAliveTimeout(300);
+					InputStream is = ftpclient.mFTPClient.retrieveFileStream(name);
+					System.out.println("is: " + is);
+					ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+					Bitmap bitmap1 = BitmapFactory.decodeStream(is);
+					
+					ByteArrayOutputStream blob = new ByteArrayOutputStream();
+					System.out.println("BLOB: " + blob);
+					if (name.endsWith(".png"))
+						bitmap1.compress(CompressFormat.PNG, 0, blob);
+					else if (name.endsWith(".jpg"))
+						bitmap1.compress(CompressFormat.JPEG, 0, blob);
+					byte[] bitmapdata = blob.toByteArray();
+					bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+					
+					is.close();
+					//blob.close();
+
+					try {
+						File newFolder = new File(Environment.getExternalStorageDirectory(), "ftp-clients-downloads");
+						if (!newFolder.exists()) {
+							newFolder.mkdir();
+						}
+						try {
+							File file = new File(newFolder, name);
+							if (!file.exists())
+								file.createNewFile();
+							FileOutputStream fos = null;
+							try {
+								fos = new FileOutputStream(file);
+
+								if (name.endsWith(".png"))
+									bitmap.compress(Bitmap.CompressFormat.PNG, 80, fos);
+								else if (name.endsWith(".jpg"))
+									bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+
+								// bitmap.compress(Bitmap.CompressFormat.PNG,
+								// 90, fos);
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							} finally {
+								try {
+									fos.close();
+								} catch (Throwable ignore) {
+								}
+							}
+						} catch (Exception ex) {
+							System.out.println("ex: " + ex);
+						}
+					} catch (Exception e) {
+						System.out.println("e: " + e);
+					} // done }
+
+					System.out.println("=======u=====");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
 			} else {
 
 				try {
-
+					ftpclient.mFTPClient.setControlKeepAliveTimeout(300);
+					ftpclient.mFTPClient.enterLocalPassiveMode();
+					ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
 					InputStream is = ftpclient.mFTPClient.retrieveFileStream(name);
-					if (is != null) {
+					String error = ftpclient.mFTPClient.getReplyString();
+					System.out.println("status: " + status + ", error: " + error);
 
+					if (is != null) {
+						ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
 						byte[] bytes = IOUtils.toByteArray(is);
 						is.close();
-						Log.d(TAG, "content*: " + new String(bytes));
-						ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+						// Log.d(TAG, "content*: " + new String(bytes));
+
 						boolean writeable = isExternalStorageWritable();
 						boolean readable = isExternalStorageReadable();
 						if (!writeable)
@@ -569,6 +571,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 								try {
 									fos = new FileOutputStream(file);
 									fos.write(bytes);
+									status = true;
 									fos.flush();
 									fos.close();
 								} catch (FileNotFoundException e) {
@@ -596,6 +599,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			} else {
 				Log.e(TAG, "Download failed");
 			}
+
 			return name;
 		}
 
@@ -651,20 +655,24 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		boolean status = false;
 
 		try {
+			// ftpclient.mFTPClient.enterLocalPassiveMode();
 			ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
+
 			InputStream is = ftpclient.mFTPClient.retrieveFileStream(name);
+			ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
 			Bitmap bitmap1 = BitmapFactory.decodeStream(is);
 			ByteArrayOutputStream blob = new ByteArrayOutputStream();
-			if(name.endsWith(".png"))
+			System.out.println("BLOB: " + blob);
+			if (name.endsWith(".png"))
 				bitmap1.compress(CompressFormat.PNG, 0, blob);
 			else if (name.endsWith(".jpg"))
 				bitmap1.compress(CompressFormat.JPEG, 0, blob);
 			byte[] bitmapdata = blob.toByteArray();
 			bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
-			
+
 			is.close();
 			blob.close();
-			
+
 			try {
 				File newFolder = new File(Environment.getExternalStorageDirectory(), "ftp-clients-downloads");
 				if (!newFolder.exists()) {
@@ -677,27 +685,33 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					FileOutputStream fos = null;
 					try {
 						fos = new FileOutputStream(file);
-						bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+
+						if (name.endsWith(".png"))
+							bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+						else if (name.endsWith(".jpg"))
+							bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+
+						// bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
-					}finally {
-					       try{
-					    	   fos.close();
-					       } catch(Throwable ignore) {}
+					} finally {
+						try {
+							fos.close();
+						} catch (Throwable ignore) {
+						}
 					}
 				} catch (Exception ex) {
 					System.out.println("ex: " + ex);
 				}
 			} catch (Exception e) {
 				System.out.println("e: " + e);
-			} // done } 
-			
+			} // done }
+
 			System.out.println("=======u=====");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		
 		return status;
 	}
 }
