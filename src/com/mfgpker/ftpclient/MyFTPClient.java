@@ -31,7 +31,6 @@ public class MyFTPClient {
 	public FTPClient mFTPClient = null;
 	static public String replay;
 	
-	@SuppressWarnings("unused")
 	private boolean isallowtodownload = false, isallowtoupload = false;
 	
 	// Method to connect to FTP server:
@@ -59,6 +58,16 @@ public class MyFTPClient {
 				 * EBCDIC_FILE_TYPE .etc. Here, I use BINARY_FILE_TYPE for
 				 * transferring text, image, and compressed files.
 				 */
+				
+				 FTPFile current = mFTPClient.listFiles(".")[0];
+				isallowtodownload = current.hasPermission(FTPFile.USER_ACCESS, FTPFile.READ_PERMISSION);
+				
+				isallowtoupload = current.hasPermission(FTPFile.USER_ACCESS, FTPFile.WRITE_PERMISSION);
+				
+				Log.d(TAG, "*isallowtodownload:: " + isallowtodownload);
+				Log.d(TAG, "*isallowtoupload:: " + isallowtoupload);
+
+				
 				mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
 				mFTPClient.enterLocalPassiveMode();
 
@@ -71,6 +80,15 @@ public class MyFTPClient {
 		return false;
 	}
 
+	
+	public boolean isAllowToUpload(){
+		return isallowtoupload;
+	}
+	
+	
+	public boolean isAllowToDownload(){
+		return isallowtodownload;
+	}
 	// Method to disconnect from FTP server:
 
 	public boolean ftpDisconnect() {

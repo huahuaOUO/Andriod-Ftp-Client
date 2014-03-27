@@ -28,9 +28,14 @@
          <activity
             android:name=".Ftp"
             android:label="FTP" >
-        </activity> <activity
+        </activity> 
+        <activity
             android:name=".Sftp"
             android:label="SFTP" >
+        </activity>
+        <activity
+            android:name=".VideoPlayer"
+            android:label="VideoPlayer" >
         </activity>
     </application>
 
