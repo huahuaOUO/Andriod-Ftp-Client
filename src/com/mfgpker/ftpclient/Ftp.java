@@ -357,8 +357,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					}
 
 				} else {
-					// Toast.makeText(getApplicationContext(),
-					// "Connection failed", 2000).show();
 					Log.e("login", "Connection failed: " + MyFTPClient.replay);
 					res = "false";
 				}
@@ -381,7 +379,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 			if (result == "true") {
 				Toast.makeText(Ftp.this, MyFTPClient.replay, Toast.LENGTH_LONG).show();
-				// basket.put
 				btnDisconnect.setEnabled(true);
 				btnUpload.setEnabled(true);
 				btnContent.setEnabled(true);
@@ -430,9 +427,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	public class ChangeDir extends AsyncTask<String, Integer, String> {
 
-		protected void onPreExecute() {
-
-		}
 
 		protected String doInBackground(String... args) {
 			ftpclient.ftpChangeDirectory(args[0]);
@@ -440,9 +434,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 			Log.d(TAG, "ChangeDir");
 			return "";
-		}
-
-		protected void onProgressUpdate(Integer... progress) {
 		}
 
 		protected void onPostExecute(String result) {
@@ -489,24 +480,22 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			Log.d(TAG, "Code: " + errorcode);
 			String result;
 			if (status == true) {
-				result = "true";
+				result = "success";
 				Log.d(TAG, "Upload success");
 			} else {
-				result = "false";
+				result = "failed";
 				Log.e(TAG, "Upload failed**");
 
 			}
-			return result + "|" + errorcode;
+			return errorcode;
 		}
 
 		protected void onProgressUpdate(Integer... progress) {
 		}
 
 		protected void onPostExecute(String result) {
-			String code = result.split("|")[1];
-			String status = result.split("|")[0];
 
-			Toast.makeText(cntx, "Upload " + status + ", " + code, Toast.LENGTH_SHORT).show();
+			Toast.makeText(cntx, result, Toast.LENGTH_SHORT).show();
 			updateList();
 		}
 	}
