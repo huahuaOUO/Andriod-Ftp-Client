@@ -59,13 +59,13 @@ public class MyFTPClient {
 				 * transferring text, image, and compressed files.
 				 */
 				
-//				 FTPFile current = mFTPClient.listFiles(".")[0];
-//				isallowtodownload = current.hasPermission(FTPFile.USER_ACCESS, FTPFile.READ_PERMISSION);
-//				
-//				isallowtoupload = current.hasPermission(FTPFile.USER_ACCESS, FTPFile.WRITE_PERMISSION);
-//				
-				Log.d(TAG, "*isallowtodownload:: " + isallowtodownload);
-				Log.d(TAG, "*isallowtoupload:: " + isallowtoupload);
+				//FTPFile current = mFTPClient.listFiles(".")[0];
+				//isallowtodownload = current.hasPermission(FTPFile.USER_ACCESS, FTPFile.READ_PERMISSION);
+				
+				//isallowtoupload = current.hasPermission(FTPFile.USER_ACCESS, FTPFile.WRITE_PERMISSION);
+				
+				//Log.d(TAG, "*isallowtodownload:: " + isallowtodownload);
+				//Log.d(TAG, "*isallowtoupload:: " + isallowtoupload);
 
 				
 				mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
