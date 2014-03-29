@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mfgpker.ftpclient"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0"
+    >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -18,7 +19,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+             android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,15 +29,18 @@
         </activity>
          <activity
             android:name=".Ftp"
-            android:label="FTP" >
+            android:label="FTP" 
+             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity> 
         <activity
             android:name=".Sftp"
-            android:label="SFTP" >
+            android:label="SFTP" 
+             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity
             android:name=".VideoPlayer"
-            android:label="VideoPlayer" >
+            android:label="VideoPlayer" 
+             android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
     </application>
 
