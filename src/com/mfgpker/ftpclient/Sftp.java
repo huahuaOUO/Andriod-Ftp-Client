@@ -38,7 +38,7 @@ public class Sftp extends Activity implements OnClickListener {
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.sftp);
+		setContentView(R.layout.ftp);
 
 		Bundle gotBasket = getIntent().getExtras();
 		SFTPHOST = gotBasket.getString("ip");
@@ -47,7 +47,7 @@ public class Sftp extends Activity implements OnClickListener {
 		SFTPUSER = gotBasket.getString("user");
 		SFTPPASS = gotBasket.getString("pass");
 
-		disc = (Button) findViewById(R.id.disconnectstp);
+		disc = (Button) findViewById(R.id.disconnect);
 		disc.setOnClickListener(this);
 
 		ConnectAndLogin();
@@ -96,7 +96,7 @@ public class Sftp extends Activity implements OnClickListener {
 
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.disconnectstp:
+		case R.id.disconnect:
 			Disconnect();
 			Log.d("guirehgreu" , "edfewfrefgrewgtrwgtrw");
 			break;

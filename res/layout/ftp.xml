@@ -19,6 +19,15 @@
         android:layout_alignParentTop="true"
         android:text="@string/disconnect" />
 
+    <Button
+        android:id="@+id/upload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/txtPath"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/getContent"
+        android:text="@string/upload" />
+
     <TextView
         android:id="@+id/txtPath"
         android:layout_width="wrap_content"
@@ -28,15 +37,6 @@
         android:layout_marginLeft="17dp"
         android:text="Path /"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/upload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/txtPath"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/getContent"
-        android:text="@string/upload" />
 
     <ListView
         android:id="@+id/contentList"

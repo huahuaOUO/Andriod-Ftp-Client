@@ -75,8 +75,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		btnUpload = (Button) findViewById(R.id.upload);
 		btnDisconnect = (Button) findViewById(R.id.disconnect);
 		btnContent = (Button) findViewById(R.id.getContent);
-		txtPath  = (TextView) findViewById(R.id.txtPath);
-		
+		txtPath = (TextView) findViewById(R.id.txtPath);
+
 		btnDisconnect.setOnClickListener(this);
 		btnUpload.setOnClickListener(this);
 		btnContent.setOnClickListener(this);
@@ -133,23 +133,85 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	}
 
-	public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id) {
+	private void switchview(Button bdown, Button bopen, Button brename, Button bdelete, ImageView icon, TextView name, TextView size, boolean switc) {
+		if (switc) {
+			bdown.setVisibility(View.VISIBLE);
+			bopen.setVisibility(View.VISIBLE);
+			brename.setVisibility(View.VISIBLE);
+			bdelete.setVisibility(View.VISIBLE);
+
+			icon.setVisibility(View.GONE);
+			name.setVisibility(View.GONE);
+			size.setVisibility(View.GONE);
+		} else {
+			bdown.setVisibility(View.GONE);
+			bopen.setVisibility(View.GONE);
+			brename.setVisibility(View.GONE);
+			bdelete.setVisibility(View.GONE);
+
+			icon.setVisibility(View.VISIBLE);
+			name.setVisibility(View.VISIBLE);
+			size.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public boolean onItemLongClick(AdapterView<?> parent, View v, int pos, long id) {
 		boolean hm = isConnected();
 		Content cur = rcontents.get(pos);
-		String cont = cur.getName();
+		final String cont = cur.getName();
 		String type = cur.getType();
 		Log.d(TAG, type + " : LONG : " + cont);
-		if (hm) {
-			if (type.equals("dir")) {
-				new ChangeDir().execute(cont);
-			} else if (type.equals("file")) {
-				new PlayVideo().execute(cont);
-			}
+
+		if (hm && type.equals("file")) {
+
+			final Button bdown = (Button) v.findViewById(R.id.menu_btnDownload);
+			final Button bopen = (Button) v.findViewById(R.id.menu_btnOpen);
+			final Button brename = (Button) v.findViewById(R.id.menu_btnRename);
+			final Button bdelete = (Button) v.findViewById(R.id.menu_btnDelete);
+
+			final ImageView icon = (ImageView) v.findViewById(R.id.item_icon);
+			final TextView name = (TextView) v.findViewById(R.id.item_txtName);
+			final TextView size = (TextView) v.findViewById(R.id.item_txtsize);
+
+			switchview(bdown, bopen, brename, bdelete, icon, name, size, true);
+
+			bdown.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
+					switchview(bdown, bopen, brename, bdelete, icon, name, size, false);
+				}
+			});
+
+			bopen.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					//new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
+					switchview(bdown, bopen, brename, bdelete, icon, name, size, false);
+				}
+			});
+
+			
+			brename.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					switchview(bdown, bopen, brename, bdelete, icon, name, size, false);
+				}
+			});
+			
+			
+			bdelete.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					switchview(bdown, bopen, brename, bdelete, icon, name, size, false);
+				}
+			});
 		}
+
 		return true;
 	}
 
-	public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
+	public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 		boolean hm = isConnected();
 		Content cur = rcontents.get(pos);
 		String cont = cur.getName();
