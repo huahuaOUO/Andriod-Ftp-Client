@@ -42,7 +42,7 @@
             android:id="@+id/menu_btnDownload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/download"
+            android:background="@drawable/download1"
             android:textSize="16sp"
             android:layout_weight="20"
             android:visibility="gone" 

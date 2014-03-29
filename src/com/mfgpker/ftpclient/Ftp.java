@@ -694,6 +694,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 							try {
 								fos = new FileOutputStream(file);
 								fos.write(bytes);
+								
 								status = true;
 								fos.flush();
 								fos.close();
