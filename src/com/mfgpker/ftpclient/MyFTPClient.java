@@ -81,6 +81,10 @@ public class MyFTPClient {
 	}
 
 	
+	public boolean isConnected(){
+		return mFTPClient.isConnected();
+	}
+	
 	public boolean isAllowToUpload(){
 		return isallowtoupload;
 	}
