@@ -17,12 +17,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPFile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -40,6 +39,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -47,6 +47,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class Ftp extends Activity implements OnClickListener, OnItemClickListener, OnItemLongClickListener {
@@ -61,8 +62,13 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	private String ip, user, pass, port;
 	private ListView contentList;
-	private List<String> realcontents = new ArrayList<String>();
-	Map<String, String> userMap = new HashMap<String, String>();
+	
+	
+	private List<Content> rcontents = new ArrayList<Content>();
+	
+//	private List<String> realcontents = new ArrayList<String>();
+//	Map<String, String> contnetsinfo = new HashMap<String, String>();
+	
 	private Button btnUpload, btnDisconnect, btnContent;
 
 	@SuppressWarnings("unused")
@@ -73,7 +79,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		setContentView(R.layout.ftp);
 
 		ftpclient = new MyFTPClient();
-		createDummyFile();
 		cntx = this.getBaseContext();
 		btnUpload = (Button) findViewById(R.id.upload);
 		btnDisconnect = (Button) findViewById(R.id.disconnect);
@@ -100,8 +105,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		user = gotBasket.getString("user");
 		pass = gotBasket.getString("pass");
 
-		if (port.isEmpty())
-			port = "21";
+		if (port.isEmpty()) port = "21";
 
 		// finishActivity(0);
 
@@ -123,8 +127,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		case R.id.getContent:
 			boolean hm1 = isConnected();
 			if (hm1) {
-				for (String g : realcontents) {
-					Log.d(TAG, g);
+				for (Content g : rcontents) {
+					Log.d(TAG, g.getName());
 				}
 				updateList();
 			}
@@ -140,8 +144,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	public boolean onItemLongClick(AdapterView<?> av, View v, int pos, long id) {
 		boolean hm = isConnected();
-		String cont = realcontents.get(pos).toString();
-		String type = userMap.get(cont);
+		Content cur = rcontents.get(pos);
+		String cont = cur.getName();
+		String type = cur.getType();
 		Log.d(TAG, type + " : LONG : " + cont);
 		if (hm) {
 			if (type.equals("dir")) {
@@ -155,8 +160,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	public void onItemClick(AdapterView<?> arg0, View v, int pos, long id) {
 		boolean hm = isConnected();
-		String cont = realcontents.get(pos).toString();
-		String type = userMap.get(cont);
+		Content cur = rcontents.get(pos);
+		String cont = cur.getName();
+		String type = cur.getType();
 		Log.d(TAG, type + ": " + cont);
 
 		if (hm) {
@@ -235,7 +241,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	}
 
 	private void logout() {
-		realcontents.clear();
+		rcontents.clear();
 		Intent i = new Intent(Ftp.this, MainActivity.class);
 		startActivity(i);
 		this.finish();
@@ -243,7 +249,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	}
 
 	void Disconnect() {
-		realcontents.clear();
+		rcontents.clear();
 		new Thread(new Runnable() {
 			public void run() {
 				ftpclient.ftpDisconnect();
@@ -268,45 +274,50 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		Disconnect();
 	}
 
-	public void createDummyFile() {
-		try {
-			FileOutputStream fos;
-			String file_content = "Hi this is a sample new file to upload for android FTP client example";
-
-			fos = openFileOutput(TEMP_FILENAME, MODE_PRIVATE);
-			fos.write(file_content.getBytes());
-			fos.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	private boolean yolo = false;
 
 	private void getContent() {
 		new Thread("contentThread") {
 			public void run() {
-				realcontents.clear();
-				userMap.clear();
+				rcontents.clear();
 				String[] contents;
-
+				
+				
 				contents = ftpclient.getContentList(workingDir);
 				for (int i = 0; i < contents.length; i++) {
+					Content content;
 					String con = contents[i];
+					FTPFile file = null;
+					String type;
+					int iconID = -1;
+					long size = 0;
+					
 					if (con.startsWith("file:")) {
 						con = con.substring(5);
+						try {
+							file = ftpclient.mFTPClient.mlistFile(workingDir + "/" + con);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
+						if(file != null){
+							size = file.getSize();
+						}
 						Log.d(TAG, "file: " + con);
-						userMap.put(con, "file");
+						Log.d(TAG, "filesize: " + size);
+						iconID = R.drawable.file;
+						type = "file";
 					} else {
 						con = con.substring(10) + "/";
 						Log.d(TAG, "dir: " + con);
-						userMap.put(con, "dir");
+						type = "dir";
+						iconID = R.drawable.dir;
 					}
-					realcontents.add(con);
+					
+					content = new Content(con, type, size, file, iconID);
+					rcontents.add(content);
 				}
-				Log.d(TAG, "*realcontents, length: " + realcontents.size());
+				Log.d(TAG, "*realcontents, length: " + rcontents.size());
 				yolo = true;
 			}
 		}.start();
@@ -319,7 +330,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		Log.d(TAG, "yolo is " + yolo);
-		contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
+		ArrayAdapter<Content> adapter = new MyListAdapter();
+		contentList.setAdapter(adapter);
+		//contentList.setAdapter(new ArrayAdapter<String>(Ftp.this, android.R.layout.simple_list_item_1, realcontents));
 		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
 
@@ -593,17 +606,15 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				System.out.println("Replay from server: " + error);
 
 				if (is != null) {
-					
+
 					byte[] bytes = IOUtils.toByteArray(is);
 					is.close();
 					// Log.d(TAG, "content*: " + new String(bytes));
 
 					boolean writeable = isExternalStorageWritable();
 					boolean readable = isExternalStorageReadable();
-					if (!writeable)
-						Log.e(TAG, "writeable is " + writeable);
-					if (!readable)
-						Log.e(TAG, "readable is " + readable);
+					if (!writeable) Log.e(TAG, "writeable is " + writeable);
+					if (!readable) Log.e(TAG, "readable is " + readable);
 					// create folder..
 					try {
 						File newFolder = new File(Environment.getExternalStorageDirectory(), "ftp-clients-downloads");
@@ -612,8 +623,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 						}
 						try {
 							File file = new File(newFolder, name);
-							if (!file.exists())
-								file.createNewFile();
+							if (!file.exists()) file.createNewFile();
 							FileOutputStream fos;
 							try {
 								fos = new FileOutputStream(file);
@@ -679,7 +689,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				ftpclient.mFTPClient.setKeepAlive(true);
 				ftpclient.mFTPClient.enterLocalPassiveMode();
 				ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
-				ftpclient.mFTPClient.setBufferSize(2224*2224);
+				ftpclient.mFTPClient.setBufferSize(2224 * 2224);
 				localFilePath = newFolder.getAbsolutePath() + "/" + name;
 				Log.d(TAG, "localFilePath: " + localFilePath);
 				FileOutputStream fos = new FileOutputStream(localFilePath);
@@ -693,8 +703,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			//ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
-			//ftpclient.ftpChangeDirectory(workingDir);
+			// ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+			// ftpclient.ftpChangeDirectory(workingDir);
 			if (status == true) {
 				Log.d(TAG, "Download success");
 			} else {
@@ -732,4 +742,41 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		return sb.toString();
 	}
 
+	
+	
+	private class MyListAdapter extends ArrayAdapter<Content> {
+
+		public MyListAdapter() {
+			super(Ftp.this, R.layout.item_view, rcontents);
+
+		}
+
+		public View getView(int pos, View convertView, ViewGroup parent) {
+			View itemView = convertView;
+			if (itemView == null) {
+				itemView = getLayoutInflater().inflate(R.layout.item_view, parent, false);
+			}
+
+			//find car work with,
+			Content currentcont = rcontents.get(pos);
+
+			//fill the view
+			//icon
+			ImageView image = (ImageView) itemView.findViewById(R.id.item_icon);
+			image.setImageResource(currentcont.getIconID());
+
+			//name
+			TextView maketext = (TextView) itemView.findViewById(R.id.item_txtName);
+			maketext.setText(currentcont.getName());
+
+
+			//size
+			TextView conditiontext = (TextView) itemView.findViewById(R.id.item_txtsize);
+			conditiontext.setText("" + currentcont.getSize());
+
+			return itemView;
+		}
+
+	}
+	
 }
