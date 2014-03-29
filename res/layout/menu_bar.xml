@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="100" >
+
+    <Button
+        android:id="@+id/menu_btnDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/m_download"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/menu_btnOpen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/menu_btnDownload"
+        android:text="@string/m_open"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/menu_Rename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/menu_btnOpen"
+        android:text="@string/m_rename"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/menu_btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/m_delete"
+        android:textSize="16sp" />
+
+</RelativeLayout>
