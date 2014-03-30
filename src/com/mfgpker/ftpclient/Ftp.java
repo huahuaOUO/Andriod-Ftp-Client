@@ -98,7 +98,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		if (port.isEmpty())
 			port = "21";
 
-
 		new Login(this).execute(ip, port, user, pass);
 	}
 
@@ -186,7 +185,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			bopen.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
-					//new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
+					// new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
 					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
@@ -513,7 +512,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			return null;
 		}
 
-
 		protected void onPostExecute(String result) {
 			progressDialog.hide();
 			if (result == null) {
@@ -669,64 +667,39 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 			String s = workingDir.equals("/") ? "" : workingDir;
 			System.out.println(s);
-
+			String localFilePath = "";
 			try {
+				boolean writeable = isExternalStorageWritable();
+				boolean readable = isExternalStorageReadable();
+				if (!writeable)
+					Log.e(TAG, "writeable is " + writeable);
+				if (!readable)
+					Log.e(TAG, "readable is " + readable);
+				// create folder..
+				File newFolder = new File(Environment.getExternalStorageDirectory(), "ftp-clients-downloads");
+				if (!newFolder.exists()) {
+					newFolder.mkdir();
+				}
+				
 				ftpclient.mFTPClient.setControlKeepAliveTimeout(300);
 				ftpclient.mFTPClient.enterLocalPassiveMode();
 				ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
-				InputStream is = ftpclient.mFTPClient.retrieveFileStream(name);
+				ftpclient.mFTPClient.setBufferSize(2224 * 2224);
+				localFilePath = newFolder.getAbsolutePath() + "/" + name;
+				Log.d(TAG, "localFilePath: " + localFilePath);
+				FileOutputStream fos = new FileOutputStream(localFilePath);
+				status = ftpclient.mFTPClient.retrieveFile(name, fos);
+				fos.close();
 				String error = ftpclient.mFTPClient.getReplyString();
 				System.out.println("Replay from server: " + error);
 
-				if (is != null) {
-
-					byte[] bytes = IOUtils.toByteArray(is);
-					is.close();
-					// Log.d(TAG, "content*: " + new String(bytes));
-
-					boolean writeable = isExternalStorageWritable();
-					boolean readable = isExternalStorageReadable();
-					if (!writeable)
-						Log.e(TAG, "writeable is " + writeable);
-					if (!readable)
-						Log.e(TAG, "readable is " + readable);
-					// create folder..
-					try {
-						File newFolder = new File(Environment.getExternalStorageDirectory(), "ftp-clients-downloads");
-						if (!newFolder.exists()) {
-							newFolder.mkdir();
-						}
-						try {
-							File file = new File(newFolder, name);
-							if (!file.exists())
-								file.createNewFile();
-							FileOutputStream fos;
-							try {
-								fos = new FileOutputStream(file);
-								fos.write(bytes);
-
-								status = true;
-								fos.flush();
-								fos.close();
-							} catch (FileNotFoundException e) {
-								Log.e(TAG, e.getMessage());
-							}
-						} catch (Exception e) {
-							Log.e(TAG, e.getMessage());
-						}
-					} catch (Exception e) {
-						Log.e(TAG, e.getMessage());
-					}
-				} else {
-					Log.e(TAG, "inputstream is null");
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
-			ftpclient.ftpChangeDirectory(workingDir);
+			//ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+			//ftpclient.ftpChangeDirectory(workingDir);
 			String statuss = "failed";
 			if (status == true) {
 				Log.d(TAG, "Download success");
@@ -758,6 +731,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 			progressDialog.show();
 		}
+
 		protected String doInBackground(String... args) {
 			boolean status = false;
 			name = args[0];
