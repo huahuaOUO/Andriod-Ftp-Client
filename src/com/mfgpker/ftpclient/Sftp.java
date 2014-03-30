@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +42,7 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 	Channel channel = null;
 	ChannelSftp channelSftp = null;
 	JSch jsch = null;
+	
 	private static String TAG = "SFTP";
 
 	private List<Content> myContents = new ArrayList<Content>();
@@ -130,7 +132,7 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 		case R.id.upload:
 			break;
 		case R.id.getContent:
-			updateList();
+			new Updatelist().execute();
 			break;
 
 		case R.id.disconnect:
@@ -151,27 +153,49 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 		Content cont = myContents.get(pos);
 	}
 
-	private void updateList() {
-		getContent();
-		txtPath.setText("Path: " + workingDir);
-		ArrayAdapter<Content> adapter = new MyListAdapter();
-		contentList.setAdapter(adapter);
-		Toast.makeText(Sftp.this, "Updated", Toast.LENGTH_SHORT).show();
-	}
 
-	private void getContent() {
-		// TODO: get name of files and folders
-		try {
-			Vector filelist = channelSftp.ls(workingDir);
-			for (int i = 0; i < filelist.size(); i++) {
-				Log.d(TAG, filelist.get(i).toString());
+	private class Updatelist extends AsyncTask<String, String, String> {
+
+		protected String doInBackground(String... params) {
+			myContents.clear();
+			try {
+				Vector filelist = channelSftp.ls(workingDir);
+				
+				for (int i = 0; i < filelist.size(); i++) {
+					Content content;
+					String filename = filelist.get(i).toString();
+					String type = "";
+					int iconID = R.drawable.file;
+					long size = 0;
+
+					content = new Content(filename, type, size, null, iconID);
+					myContents.add(content);
+					Log.d(TAG, filename);
+				}
+			} catch (SftpException e) {
+				e.printStackTrace();
 			}
-		} catch (SftpException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			return null;
 		}
+
+		protected void onProgressUpdate(String... values) {
+			super.onProgressUpdate(values);
+		}
+
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+
+			txtPath.setText("Path: " + workingDir);
+			ArrayAdapter<Content> adapter = new MyListAdapter();
+			contentList.setAdapter(adapter);
+			Toast.makeText(Sftp.this, "Updated", Toast.LENGTH_SHORT).show();
+		}
+
 	}
 
+	
+	//my listadapter
 	private class MyListAdapter extends ArrayAdapter<Content> {
 
 		public MyListAdapter() {

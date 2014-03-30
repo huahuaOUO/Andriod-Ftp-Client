@@ -8,12 +8,10 @@
  */
 package com.mfgpker.ftpclient;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +57,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	private String ip, user, pass, port;
 	private ListView contentList;
-	private TextView txtPath;
+	public TextView txtPath;
 	private List<Content> rcontents = new ArrayList<Content>();
 
 	private Button btnUpload, btnDisconnect, btnContent;
@@ -115,7 +113,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				for (Content g : rcontents) {
 					Log.d(TAG, g.getName());
 				}
-				updateList();
+				new Updatelist().execute();
 			}
 
 			break;
@@ -318,7 +316,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			public void run() {
 				ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
 				ftpclient.ftpChangeDirectory(workingDir);
-				updateList();
+				new Updatelist().execute();
 				Log.d(TAG, "Reconnect");
 			}
 		}).start();
@@ -327,68 +325,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	protected void onDestroy() {
 		super.onDestroy();
 		Disconnect();
-	}
-
-	private boolean yolo = false;
-
-	private void getContent() {
-		new Thread("contentThread") {
-			public void run() {
-				rcontents.clear();
-				String[] contents;
-
-				contents = ftpclient.getContentList(workingDir);
-				for (int i = 0; i < contents.length; i++) {
-					Content content;
-					String con = contents[i];
-					FTPFile file = null;
-					String type;
-					int iconID = -1;
-					long size = 0;
-
-					if (con.startsWith("file:")) {
-						con = con.substring(5);
-						try {
-							file = ftpclient.mFTPClient.mlistFile(workingDir + "/" + con);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
-						if (file != null) {
-							size = file.getSize();
-						}
-						Log.d(TAG, "file: " + con);
-						Log.d(TAG, "filesize: " + size);
-						iconID = R.drawable.file;
-						type = "file";
-					} else {
-						con = con.substring(10) + "/";
-						Log.d(TAG, "dir: " + con);
-						type = "dir";
-						iconID = R.drawable.dir;
-					}
-
-					content = new Content(con, type, size, file, iconID);
-					rcontents.add(content);
-				}
-				Log.d(TAG, "*realcontents, length: " + rcontents.size());
-				yolo = true;
-			}
-		}.start();
-	}
-
-	private void updateList() {
-		yolo = false;
-		getContent();
-		while (!yolo) {
-		}
-		txtPath.setText("Path: " + workingDir);
-		Log.d(TAG, "yolo is " + yolo);
-		ArrayAdapter<Content> adapter = new MyListAdapter();
-		contentList.setAdapter(adapter);
-		// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
-		// android.R.layout.simple_list_item_1, realcontents));
-		Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
 	}
 
 	public void onBackPressed() {
@@ -437,7 +373,11 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		return yy;
 	}
 
-	public class Login extends AsyncTask<String, Integer, String> {
+	/*
+	 * Generics 1. String: Type of reference(s) passed to doInBackground() 2. Integer: Type of reference passed to OnProgressUpdate() 3. String: Type of reference returned by doInBackground() Value passed to onPostExecute()
+	 */
+
+	private class Login extends AsyncTask<String, Integer, String> {
 
 		private final ProgressDialog progressDialog;
 
@@ -550,7 +490,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					e.printStackTrace();
 				}
 
-				updateList();
+				new Updatelist().execute();
 				Log.d(TAG, "worksdir: " + workingDir);
 			} else {
 				Disconnect();
@@ -564,7 +504,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
-	public class ChangeDir extends AsyncTask<String, Integer, String> {
+	private class ChangeDir extends AsyncTask<String, Integer, String> {
 
 		protected String doInBackground(String... args) {
 			ftpclient.ftpChangeDirectory(args[0]);
@@ -575,7 +515,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		protected void onPostExecute(String result) {
-			updateList();
+			new Updatelist().execute();
 		}
 	}
 
@@ -636,11 +576,11 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		protected void onPostExecute(String result) {
 			progressDialog.hide();
 			Toast.makeText(cntx, result, Toast.LENGTH_SHORT).show();
-			updateList();
+			new Updatelist().execute();
 		}
 	}
 
-	public class DownloadFile extends AsyncTask<String, Integer, String> {
+	private class DownloadFile extends AsyncTask<String, Integer, String> {
 
 		String name;
 		private final ProgressDialog progressDialog;
@@ -678,7 +618,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				if (!newFolder.exists()) {
 					newFolder.mkdir();
 				}
-				
+
 				ftpclient.mFTPClient.setControlKeepAliveTimeout(300);
 				ftpclient.mFTPClient.enterLocalPassiveMode();
 				ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -696,8 +636,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			//ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
-			//ftpclient.ftpChangeDirectory(workingDir);
+			// ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
+			// ftpclient.ftpChangeDirectory(workingDir);
 			String statuss = "failed";
 			if (status == true) {
 				Log.d(TAG, "Download success");
@@ -715,7 +655,68 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
-	public class PlayVideo extends AsyncTask<String, Integer, String> {
+	private class Updatelist extends AsyncTask<String, String, String> {
+
+		protected String doInBackground(String... params) {
+			rcontents.clear();
+			String[] contents;
+
+			contents = ftpclient.getContentList(workingDir);
+			for (int i = 0; i < contents.length; i++) {
+				Content content;
+				String con = contents[i];
+				FTPFile file = null;
+				String type;
+				int iconID = -1;
+				long size = 0;
+
+				if (con.startsWith("file:")) {
+					con = con.substring(5);
+					try {
+						file = ftpclient.mFTPClient.mlistFile(workingDir + "/" + con);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					if (file != null) {
+						size = file.getSize();
+					}
+					Log.d(TAG, "file: " + con);
+					Log.d(TAG, "filesize: " + size);
+					iconID = R.drawable.file;
+					type = "file";
+				} else {
+					con = con.substring(10) + "/";
+					Log.d(TAG, "dir: " + con);
+					type = "dir";
+					iconID = R.drawable.dir;
+				}
+
+				content = new Content(con, type, size, file, iconID);
+				rcontents.add(content);
+			}
+			Log.d(TAG, "*realcontents, length: " + rcontents.size());
+
+			return null;
+		}
+
+		protected void onProgressUpdate(String... values) {
+			super.onProgressUpdate(values);
+		}
+
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+
+			ArrayAdapter<Content> adapter = new MyListAdapter();
+			contentList.setAdapter(adapter);
+			Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
+
+		}
+
+	}
+
+	// TODO:remove this
+	private class PlayVideo extends AsyncTask<String, Integer, String> {
 
 		String name;
 		private final ProgressDialog progressDialog;
@@ -785,22 +786,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				startActivity(i);
 			}
 		}
-	}
-
-	@SuppressWarnings("unused")
-	private static String convertStreamToString(InputStream is) throws Exception {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
-		String line = null;
-
-		while ((line = reader.readLine()) != null) {
-			sb.append(line);
-		}
-
-		is.close();
-		reader.close();
-
-		return sb.toString();
 	}
 
 	private class MyListAdapter extends ArrayAdapter<Content> {
