@@ -563,16 +563,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			File f = new File(path);
 			String abspath = f.getAbsolutePath();
 
-			File file = new File(abspath);
-			InputStream is = null;
-				try {
-					is = new BufferedInputStream(new FileInputStream(file));
-					
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
 			status = ftpclient.ftpUpload(abspath, f.getName(), "/", cntx);
 			String errorcode = ftpclient.mFTPClient.getReplyString();
 			Log.d(TAG, "Code: " + errorcode);
