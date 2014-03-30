@@ -20,6 +20,7 @@
     <string name="m_rename">Rename</string>
     <string name="m_delete">Delete</string>
     <string name="m_cancel">Cancel</string>
+    <string name="empty_string"></string>
 
     <string-array name="connection_protocol_array">
         <item>FTP - File Transfer Protocol</item>

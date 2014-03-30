@@ -10,8 +10,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
-        android:maxHeight="80dp"
-        android:maxWidth="80dp"
+        android:maxHeight="50dp"
+        android:maxWidth="50dp"
         android:src="@drawable/file" />
 
     <TextView

@@ -98,11 +98,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		if (port.isEmpty())
 			port = "21";
 
-		// finishActivity(0);
 
-		new Login().execute(ip, port, user, pass);
-		// contentList.setAdapter(new ArrayAdapter<String>(Ftp.this,
-		// android.R.layout.simple_list_item_1, realcontents));
+		new Login(this).execute(ip, port, user, pass);
 	}
 
 	public void onClick(View v) {
@@ -181,7 +178,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			bdown.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
-					new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
+					new DownloadFile(Ftp.this).execute(cont, Environment.getExternalStorageDirectory().getPath());
 					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
@@ -194,22 +191,20 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				}
 			});
 
-			
 			brename.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
 					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
-			
-			
+
 			bdelete.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
 					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
-			
+
 			bcancal.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
@@ -232,7 +227,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			if (type.equals("dir")) {
 				new ChangeDir().execute(cont);
 			} else if (type.equals("file")) {
-				new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
+				new DownloadFile(this).execute(cont, Environment.getExternalStorageDirectory().getPath());
 			}
 		}
 
@@ -267,7 +262,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					File fil = new File(path);
 					String name = fil.getName();
 					System.out.println(fil.exists());
-					new UploadFile().execute(path, name);
+					new UploadFile(this).execute(path, name);
 					Log.d(TAG, "File Path: " + path + ", name: " + name);
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
@@ -447,14 +442,16 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	public class Login extends AsyncTask<String, Integer, String> {
 
-		ProgressDialog dialog;
+		private final ProgressDialog progressDialog;
+
+		public Login(Context ctx) {
+			progressDialog = MyCustomProgressDialog.ctor(ctx);
+		}
 
 		protected void onPreExecute() {
-			dialog = new ProgressDialog(Ftp.this);
-			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			dialog.setMax(100);
-			dialog.show();
+			super.onPreExecute();
 
+			progressDialog.show();
 		}
 
 		protected String doInBackground(String... args) {
@@ -509,7 +506,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					Log.e("login", "Connection failed: " + MyFTPClient.replay);
 					res = "false";
 				}
-				dialog.dismiss();
 				return res;
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
@@ -517,11 +513,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			return null;
 		}
 
-		protected void onProgressUpdate(Integer... progress) {
-			dialog.incrementProgressBy(progress[0]);
-		}
 
 		protected void onPostExecute(String result) {
+			progressDialog.hide();
 			if (result == null) {
 				Toast.makeText(Ftp.this, "ERROR", Toast.LENGTH_LONG).show();
 			}
@@ -609,8 +603,16 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	public class UploadFile extends AsyncTask<String, Integer, String> {
 
-		protected void onPreExecute() {
+		private final ProgressDialog progressDialog;
 
+		public UploadFile(Context ctx) {
+			progressDialog = MyCustomProgressDialog.ctor(ctx);
+		}
+
+		protected void onPreExecute() {
+			super.onPreExecute();
+
+			progressDialog.show();
 		}
 
 		protected String doInBackground(String... args) {
@@ -635,11 +637,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			return errorcode;
 		}
 
-		protected void onProgressUpdate(Integer... progress) {
-		}
-
 		protected void onPostExecute(String result) {
-
+			progressDialog.hide();
 			Toast.makeText(cntx, result, Toast.LENGTH_SHORT).show();
 			updateList();
 		}
@@ -648,6 +647,17 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	public class DownloadFile extends AsyncTask<String, Integer, String> {
 
 		String name;
+		private final ProgressDialog progressDialog;
+
+		public DownloadFile(Context ctx) {
+			progressDialog = MyCustomProgressDialog.ctor(ctx);
+		}
+
+		protected void onPreExecute() {
+			super.onPreExecute();
+
+			progressDialog.show();
+		}
 
 		protected String doInBackground(String... args) {
 			boolean status = false;
@@ -694,7 +704,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 							try {
 								fos = new FileOutputStream(file);
 								fos.write(bytes);
-								
+
 								status = true;
 								fos.flush();
 								fos.close();
@@ -729,6 +739,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		protected void onPostExecute(String result) {
+			progressDialog.hide();
 			Toast.makeText(cntx, "Download " + result, Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -736,7 +747,17 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	public class PlayVideo extends AsyncTask<String, Integer, String> {
 
 		String name;
+		private final ProgressDialog progressDialog;
 
+		public PlayVideo(Context ctx) {
+			progressDialog = MyCustomProgressDialog.ctor(ctx);
+		}
+
+		protected void onPreExecute() {
+			super.onPreExecute();
+
+			progressDialog.show();
+		}
 		protected String doInBackground(String... args) {
 			boolean status = false;
 			name = args[0];
@@ -782,6 +803,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 		protected void onPostExecute(String result) {
+			progressDialog.hide();
 			if (!result.isEmpty()) {
 				Intent i = new Intent(Ftp.this, VideoPlayer.class);
 				Bundle b = new Bundle();
