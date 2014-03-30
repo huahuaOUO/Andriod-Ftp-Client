@@ -70,6 +70,15 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
-	    android:layout_below="@+id/checkBoxsavedata" />
+	    android:layout_below="@+id/checkBoxsavedata"
+	    android:layout_marginTop="16dp" />
+
+	<Spinner
+	    android:id="@+id/spinnerSaveinfo"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_below="@+id/etpassword"
+	    android:layout_toRightOf="@+id/checkBoxsavedata" />
 	
 </RelativeLayout>

@@ -27,4 +27,17 @@
         <item>SFTP - SSH File Transfer Protocol</item>
     </string-array>
 
+    
+    <string-array name="Saveprofil_array">
+        <item>Profil 1</item>
+        <item>profil 2</item>
+        <item>Profil 3</item>
+        <item>profil 4</item>
+        <item>Profil 5</item>
+        <item>profil 6</item>
+        <item>profil 7</item>
+        <item>profil 8</item>
+        <item>profil 9</item>
+    </string-array>
+    
 </resources>
