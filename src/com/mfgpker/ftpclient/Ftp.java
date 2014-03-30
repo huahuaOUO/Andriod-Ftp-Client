@@ -8,7 +8,10 @@
  */
 package com.mfgpker.ftpclient;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,7 +79,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		btnDisconnect.setOnClickListener(this);
 		btnUpload.setOnClickListener(this);
 		btnContent.setOnClickListener(this);
-
 		contentList = (ListView) findViewById(R.id.contentList);
 		contentList.setOnItemClickListener(this);
 		contentList.setOnItemLongClickListener(this);
@@ -561,6 +563,16 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			File f = new File(path);
 			String abspath = f.getAbsolutePath();
 
+			File file = new File(abspath);
+			InputStream is = null;
+				try {
+					is = new BufferedInputStream(new FileInputStream(file));
+					
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
 			status = ftpclient.ftpUpload(abspath, f.getName(), "/", cntx);
 			String errorcode = ftpclient.mFTPClient.getReplyString();
 			Log.d(TAG, "Code: " + errorcode);
@@ -669,7 +681,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				String type;
 				int iconID = -1;
 				long size = 0;
-
+				String checksum = "";
 				if (con.startsWith("file:")) {
 					con = con.substring(5);
 					try {
@@ -678,6 +690,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 						e.printStackTrace();
 					}
 
+					
+					
 					if (file != null) {
 						size = file.getSize();
 					}
@@ -692,7 +706,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					iconID = R.drawable.dir;
 				}
 
-				content = new Content(con, type, size, file, iconID);
+				content = new Content(con, type, size, file, iconID, checksum);
 				rcontents.add(content);
 			}
 			Log.d(TAG, "*realcontents, length: " + rcontents.size());

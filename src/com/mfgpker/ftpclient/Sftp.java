@@ -167,8 +167,9 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 					String type = "";
 					int iconID = R.drawable.file;
 					long size = 0;
+					String checksum = "";
 
-					content = new Content(filename, type, size, null, iconID);
+					content = new Content(filename, type, size, null, iconID, checksum);
 					myContents.add(content);
 					Log.d(TAG, filename);
 				}

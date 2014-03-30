@@ -17,15 +17,17 @@ public class Content {
 	private Long size;
 	private FTPFile ftpFile;
 	private int iconID;
+	private String checksum;
 	
 	
-	public Content(String name, String type, Long size, FTPFile ftpFile, int iconID) {
+	public Content(String name, String type, Long size, FTPFile ftpFile, int iconID, String checksum) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.size = size;
 		this.ftpFile = ftpFile;
 		this.iconID = iconID;
+		this.checksum = checksum;
 	}
 
 
