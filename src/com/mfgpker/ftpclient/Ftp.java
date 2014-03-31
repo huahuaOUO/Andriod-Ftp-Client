@@ -41,6 +41,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -188,7 +189,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			brename.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
+					new RenameFile(Ftp.this).execute(cont);
+					
 					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
+					
 				}
 			});
 
@@ -656,6 +660,54 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
+	private class RenameFile extends AsyncTask<String, Integer, Integer> {
+		
+		
+		public RenameFile(Context ctn){
+
+			
+
+			
+		}
+		
+		protected Integer doInBackground(String... args) {
+			final String oldname = args[0];
+			AlertDialog.Builder alert = new AlertDialog.Builder(Ftp.this);
+
+			alert.setTitle("Title");
+			alert.setMessage("Message");
+
+			// Set an EditText view to get user input 
+			final EditText input = new EditText(Ftp.this);
+			alert.setView(input);
+
+			
+			alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+				  String newname = input.getText().toString();
+				  // Do something with value!
+				  Log.d(TAG, newname);
+				  ftpclient.ftpRenameFile(oldname, newname);
+				  }
+				});
+
+				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				  public void onClick(DialogInterface dialog, int whichButton) {
+				    // Canceled.
+				  }
+				});
+				alert.show();
+			return null;
+		}
+
+		protected void onPostExecute(Integer result) {
+			super.onPostExecute(result);
+		}
+		
+	}
+
+	
+	
 	private class Updatelist extends AsyncTask<String, String, String> {
 
 		protected String doInBackground(String... params) {
