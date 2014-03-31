@@ -21,7 +21,8 @@
     <string name="m_delete">Delete</string>
     <string name="m_cancel">Cancel</string>
     <string name="empty_string"></string>
-
+    <string name="Select_a_File_to_Upload">Select a File to Upload</string>
+	<string name="install_filemanager">Please install a File Manager.</string> 
     <string-array name="connection_protocol_array">
         <item>FTP - File Transfer Protocol</item>
         <item>SFTP - SSH File Transfer Protocol</item>

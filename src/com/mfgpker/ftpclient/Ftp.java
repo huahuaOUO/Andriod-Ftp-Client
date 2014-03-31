@@ -156,9 +156,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		final Content cur = rcontents.get(pos);
 		final String cont = cur.getName();
 		String type = cur.getType();
-		Log.d(TAG, type + " : LONG : " + cont);
-
-		if (hm && type.equals("file")) {
+		int contid = cur.getID();
+		Log.d(TAG, type + " : LONG : " + cont + ", id: " + contid);
+		if (hm && type.equals("file") && contid == pos) {
 
 			final Button bdown = (Button) v.findViewById(R.id.menu_btnDownload);
 			final Button bopen = (Button) v.findViewById(R.id.menu_btnOpen);
@@ -238,10 +238,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 
 		try {
-			startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+			startActivityForResult(Intent.createChooser(intent, getString(R.string.Select_a_File_to_Upload)), FILE_SELECT_CODE);
 		} catch (android.content.ActivityNotFoundException ex) {
 			// Potentially direct the user to the Market with a Dialog
-			Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, R.string.install_filemanager, Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -662,7 +662,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		protected String doInBackground(String... params) {
 			rcontents.clear();
 			String[] contents;
-
+			int id = 0;
 			contents = ftpclient.getContentList(workingDir);
 			for (int i = 0; i < contents.length; i++) {
 				Content content;
@@ -680,8 +680,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 						e.printStackTrace();
 					}
 
-					
-					
 					if (file != null) {
 						size = file.getSize();
 					}
@@ -696,8 +694,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					iconID = R.drawable.dir;
 				}
 
-				content = new Content(con, type, size, file, iconID, checksum);
+				content = new Content(id, con, type, size, file, iconID, checksum);
 				rcontents.add(content);
+				id++;
 			}
 			Log.d(TAG, "*realcontents, length: " + rcontents.size());
 

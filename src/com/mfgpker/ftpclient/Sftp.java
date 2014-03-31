@@ -38,11 +38,6 @@ import com.jcraft.jsch.SftpException;
 
 public class Sftp extends Activity implements OnClickListener, OnItemClickListener, OnItemLongClickListener {
 
-	Session session = null;
-	Channel channel = null;
-	ChannelSftp channelSftp = null;
-	JSch jsch = null;
-	
 	private static String TAG = "SFTP";
 
 	private List<Content> myContents = new ArrayList<Content>();
@@ -82,46 +77,9 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 		contentList.setOnItemClickListener(this);
 		contentList.setOnItemLongClickListener(this);
 
-		ConnectAndLogin();
-	}
-
-	public void ConnectAndLogin() {
-		new Thread(new Runnable() {
-			public void run() {
-
-				try {
-					jsch = new JSch();
-					session = jsch.getSession(SFTPUSER, SFTPHOST, SFTPPORT);
-					session.setPassword(SFTPPASS);
-					java.util.Properties config = new java.util.Properties();
-					config.put("StrictHostKeyChecking", "no");
-					session.setConfig(config);
-					session.connect(); // crash here!
-					channel = session.openChannel("sftp");
-					channel.connect();
-
-					channelSftp = (ChannelSftp) channel;
-
-					workingDir = channelSftp.getHome();
-					orginalDir = workingDir;
-					channelSftp.cd(workingDir);
-					System.out.println(channelSftp.getHome());
-					// channelSftp.get("remotefile.txt", "localfile.txt");
-					// File f = new File(FILETOTRANSFER);
-					// channelSftp.put(new FileInputStream(f), f.getName());
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-
-			}
-		}).start();
-
 	}
 
 	private void Disconnect() {
-		channelSftp.exit();
-		session.disconnect();
 		Intent i = new Intent(Sftp.this, MainActivity.class);
 		startActivity(i);
 		this.finish();
@@ -153,30 +111,18 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 		Content cont = myContents.get(pos);
 	}
 
-
 	private class Updatelist extends AsyncTask<String, String, String> {
 
 		protected String doInBackground(String... params) {
 			myContents.clear();
-			try {
-				Vector filelist = channelSftp.ls(workingDir);
-				
-				for (int i = 0; i < filelist.size(); i++) {
-					Content content;
-					String filename = filelist.get(i).toString();
-					String type = "";
-					int iconID = R.drawable.file;
-					long size = 0;
-					String checksum = "";
-
-					content = new Content(filename, type, size, null, iconID, checksum);
-					myContents.add(content);
-					Log.d(TAG, filename);
-				}
-			} catch (SftpException e) {
-				e.printStackTrace();
-			}
-
+			int id = 0;
+			/*
+			 * try {
+			 * 
+			 * for (int i = 0; i < filelist.size(); i++) { Content content; String filename = filelist.get(i).toString(); String type = ""; int iconID = R.drawable.file; long size = 0; String checksum = "";
+			 * 
+			 * content = new Content(id, filename, type, size, null, iconID, checksum); myContents.add(content); id++; Log.d(TAG, filename); } } catch (SftpException e) { e.printStackTrace(); }
+			 */
 			return null;
 		}
 
@@ -195,8 +141,7 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 
 	}
 
-	
-	//my listadapter
+	// my listadapter
 	private class MyListAdapter extends ArrayAdapter<Content> {
 
 		public MyListAdapter() {

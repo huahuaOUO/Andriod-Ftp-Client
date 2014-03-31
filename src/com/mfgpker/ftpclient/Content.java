@@ -18,9 +18,10 @@ public class Content {
 	private FTPFile ftpFile;
 	private int iconID;
 	private String checksum;
+	private int ID;
 	
 	
-	public Content(String name, String type, Long size, FTPFile ftpFile, int iconID, String checksum) {
+	public Content(int ID, String name, String type, Long size, FTPFile ftpFile, int iconID, String checksum) {
 		super();
 		this.name = name;
 		this.type = type;
@@ -28,6 +29,7 @@ public class Content {
 		this.ftpFile = ftpFile;
 		this.iconID = iconID;
 		this.checksum = checksum;
+		this.ID = ID;
 	}
 
 
@@ -53,6 +55,16 @@ public class Content {
 
 	public int getIconID() {
 		return iconID;
+	}
+
+
+	public String getChecksum() {
+		return checksum;
+	}
+
+
+	public int getID() {
+		return ID;
 	}
 	
 	
