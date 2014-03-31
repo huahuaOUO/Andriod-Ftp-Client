@@ -8,10 +8,7 @@
  */
 package com.mfgpker.ftpclient;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -582,7 +579,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
-	private class DownloadFile extends AsyncTask<String, Integer, String> {
+	private class DownloadFile extends AsyncTask<String, Integer, Integer> {
 
 		String name;
 		private final ProgressDialog progressDialog;
@@ -597,7 +594,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			progressDialog.show();
 		}
 
-		protected String doInBackground(String... args) {
+		protected Integer doInBackground(String... args) {
 			boolean status = false;
 			name = args[0];
 			String path = args[1];
@@ -640,10 +637,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			}
 			// ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
 			// ftpclient.ftpChangeDirectory(workingDir);
-			String statuss = "failed";
+			int statuss = 0;
 			if (status == true) {
 				Log.d(TAG, "Download success");
-				statuss = "success";
+				statuss = 1;
 			} else {
 				Log.e(TAG, "Download failed");
 			}
@@ -651,9 +648,11 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			return statuss;
 		}
 
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(Integer result) {
 			progressDialog.hide();
-			Toast.makeText(cntx, "Download " + result, Toast.LENGTH_SHORT).show();
+
+			int id = (result == 1) ? R.string.Download_success : R.string.Download_failed;
+			Toast.makeText(cntx, id, Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -712,83 +711,10 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 			ArrayAdapter<Content> adapter = new MyListAdapter();
 			contentList.setAdapter(adapter);
-			Toast.makeText(Ftp.this, "Updated", Toast.LENGTH_SHORT).show();
+			Toast.makeText(Ftp.this, R.string.Updated, Toast.LENGTH_SHORT).show();
 
 		}
 
-	}
-
-	// TODO:remove this
-	private class PlayVideo extends AsyncTask<String, Integer, String> {
-
-		String name;
-		private final ProgressDialog progressDialog;
-
-		public PlayVideo(Context ctx) {
-			progressDialog = MyCustomProgressDialog.ctor(ctx);
-		}
-
-		protected void onPreExecute() {
-			super.onPreExecute();
-
-			progressDialog.show();
-		}
-
-		protected String doInBackground(String... args) {
-			boolean status = false;
-			name = args[0];
-			Log.d(TAG, "name: " + name);
-			System.out.println(name);
-
-			String s = workingDir.equals("/") ? "" : workingDir;
-			System.out.println(s);
-			String localFilePath = "";
-			try {
-
-				File newFolder = new File(Environment.getExternalStorageDirectory() + "/ftp-clients-downloads", "temp");
-				if (!newFolder.exists()) {
-					newFolder.mkdir();
-				}
-
-				ftpclient.mFTPClient.setKeepAlive(true);
-				ftpclient.mFTPClient.enterLocalPassiveMode();
-				ftpclient.mFTPClient.setFileType(FTP.BINARY_FILE_TYPE);
-				ftpclient.mFTPClient.setBufferSize(2224 * 2224);
-				localFilePath = newFolder.getAbsolutePath() + "/" + name;
-				Log.d(TAG, "localFilePath: " + localFilePath);
-				FileOutputStream fos = new FileOutputStream(localFilePath);
-				status = ftpclient.mFTPClient.retrieveFile(name, fos);
-				fos.close();
-				String error = ftpclient.mFTPClient.getReplyString();
-				System.out.println("Replay from server: " + error);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			// ftpclient.ftpConnect(ip, user, pass, Integer.parseInt(port));
-			// ftpclient.ftpChangeDirectory(workingDir);
-			if (status == true) {
-				Log.d(TAG, "Download success");
-			} else {
-				Log.e(TAG, "Download failed");
-			}
-
-			return localFilePath;
-		}
-
-		protected void onPostExecute(String result) {
-			progressDialog.hide();
-			if (!result.isEmpty()) {
-				Intent i = new Intent(Ftp.this, VideoPlayer.class);
-				Bundle b = new Bundle();
-				b.putString("name", name);
-				b.putString("path", result);
-				i.putExtras(b);
-				startActivity(i);
-			}
-		}
 	}
 
 	private class MyListAdapter extends ArrayAdapter<Content> {

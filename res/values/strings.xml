@@ -23,6 +23,10 @@
     <string name="empty_string"></string>
     <string name="Select_a_File_to_Upload">Select a File to Upload</string>
 	<string name="install_filemanager">Please install a File Manager.</string> 
+	<string name="Updated">Updated</string> 
+	<string name="Download_success">Download success</string> 
+	<string name="Download_failed">Download failed</string> 
+	
     <string-array name="connection_protocol_array">
         <item>FTP - File Transfer Protocol</item>
         <item>SFTP - SSH File Transfer Protocol</item>
