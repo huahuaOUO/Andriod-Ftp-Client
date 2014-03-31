@@ -10,7 +10,8 @@ package com.mfgpker.ftpclient;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
+
+import org.apache.commons.net.ftp.FTPFile;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -30,12 +31,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
-
 public class Sftp extends Activity implements OnClickListener, OnItemClickListener, OnItemLongClickListener {
 
 	private static String TAG = "SFTP";
@@ -43,24 +38,26 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 	private List<Content> myContents = new ArrayList<Content>();
 
 	String SFTPHOST;
-	int SFTPPORT;
 	String SFTPUSER;
 	String SFTPPASS;
 	String workingDir, orginalDir;
 
 	private Button btnUpload, btnDisconnect, btnContent;
 
+	private SftpClient sftpclient;
+
 	private ListView contentList;
 	private TextView txtPath;
+
+	boolean islogin;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ftp);
 
 		Bundle gotBasket = getIntent().getExtras();
+
 		SFTPHOST = gotBasket.getString("ip");
-		String port = gotBasket.getString("port");
-		SFTPPORT = Integer.parseInt(port.isEmpty() ? "22" : port);
 		SFTPUSER = gotBasket.getString("user");
 		SFTPPASS = gotBasket.getString("pass");
 
@@ -76,10 +73,14 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 		contentList = (ListView) findViewById(R.id.contentList);
 		contentList.setOnItemClickListener(this);
 		contentList.setOnItemLongClickListener(this);
+		sftpclient = new SftpClient();
 
+		new Login().execute(SFTPHOST, SFTPUSER, SFTPPASS);
+		// Disconnect();
 	}
 
 	private void Disconnect() {
+		sftpclient.Disconnect();
 		Intent i = new Intent(Sftp.this, MainActivity.class);
 		startActivity(i);
 		this.finish();
@@ -95,7 +96,7 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 
 		case R.id.disconnect:
 			Disconnect();
-			Log.d("guirehgreu", "edfewfrefgrewgtrwgtrw");
+			Log.d(TAG, "edfewfrefgrewgtrwgtrw");
 			break;
 		}
 	}
@@ -111,18 +112,53 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 		Content cont = myContents.get(pos);
 	}
 
+	private class Login extends AsyncTask<String, String, Integer> {
+
+		protected Integer doInBackground(String... args) {
+			String host = args[0];
+			String user = args[1];
+			String password = args[2];
+
+			boolean status = sftpclient.Login(host, user, password);
+			if (status)
+				return 1;
+			else
+				return 2;
+		}
+
+		protected void onPostExecute(Integer result) {
+			super.onPostExecute(result);
+
+			if (result == 1) {
+				workingDir = sftpclient.getHome();
+			}
+
+			String con = result == 1 ? "true" : "false";
+			Toast.makeText(Sftp.this, con, Toast.LENGTH_SHORT).show();
+		}
+
+	}
+
 	private class Updatelist extends AsyncTask<String, String, String> {
 
 		protected String doInBackground(String... params) {
 			myContents.clear();
+			String[] contents = null;
 			int id = 0;
-			/*
-			 * try {
-			 * 
-			 * for (int i = 0; i < filelist.size(); i++) { Content content; String filename = filelist.get(i).toString(); String type = ""; int iconID = R.drawable.file; long size = 0; String checksum = "";
-			 * 
-			 * content = new Content(id, filename, type, size, null, iconID, checksum); myContents.add(content); id++; Log.d(TAG, filename); } } catch (SftpException e) { e.printStackTrace(); }
-			 */
+
+			for (int i = 0; i < contents.length; i++) {
+				Content content;
+				String con = "";
+				FTPFile file = null;
+				String type = "";
+				int iconID = -1;
+				long size = 0;
+				String checksum = "";
+
+				content = new Content(id, con, type, size, file, iconID, checksum);
+				myContents.add(content);
+				id++;
+			}
 			return null;
 		}
 
@@ -136,7 +172,7 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 			txtPath.setText("Path: " + workingDir);
 			ArrayAdapter<Content> adapter = new MyListAdapter();
 			contentList.setAdapter(adapter);
-			Toast.makeText(Sftp.this, "Updated", Toast.LENGTH_SHORT).show();
+			Toast.makeText(Sftp.this, R.string.Updated, Toast.LENGTH_SHORT).show();
 		}
 
 	}
