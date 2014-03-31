@@ -8,8 +8,15 @@
  */
 package com.mfgpker.ftpclient;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.IOUtils;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.connection.channel.direct.Session.Command;
 
 import org.apache.commons.net.ftp.FTPFile;
 
@@ -119,11 +126,28 @@ public class Sftp extends Activity implements OnClickListener, OnItemClickListen
 			String user = args[1];
 			String password = args[2];
 
-			boolean status = sftpclient.Login(host, user, password);
-			if (status)
-				return 1;
-			else
-				return 2;
+			try {
+				SSHClient ssh = new SSHClient();
+				ssh.loadKnownHosts();
+				ssh.connect(host, 22);
+				ssh.authPublickey(user);
+				ssh.authPassword(user, password);
+				final Session session = ssh.startSession();
+				final Command cmd = session.exec("ping -c 1 google.com");
+				System.out.println(IOUtils.readFully(cmd.getInputStream()).toString());
+				cmd.join(5, TimeUnit.SECONDS);
+				System.out.println("\n** exit status: " + cmd.getExitStatus());
+				
+				
+				
+				session.close();
+				ssh.disconnect();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+
+			return 0;
+
 		}
 
 		protected void onPostExecute(Integer result) {
