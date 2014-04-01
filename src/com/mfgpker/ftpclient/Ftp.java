@@ -125,10 +125,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	}
 
-	private void switchview(Button bdown, Button bopen, Button brename, Button bdelete, Button bcancal, ImageView icon, TextView name, TextView size, boolean switc) {
+	private void switchview(Button bdown, Button brename, Button bdelete, Button bcancal, ImageView icon, TextView name, TextView size, boolean switc) {
 		if (switc) {
 			bdown.setVisibility(View.VISIBLE);
-			bopen.setVisibility(View.VISIBLE);
 			brename.setVisibility(View.VISIBLE);
 			bdelete.setVisibility(View.VISIBLE);
 			bcancal.setVisibility(View.VISIBLE);
@@ -138,7 +137,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			size.setVisibility(View.GONE);
 		} else {
 			bdown.setVisibility(View.GONE);
-			bopen.setVisibility(View.GONE);
 			brename.setVisibility(View.GONE);
 			bdelete.setVisibility(View.GONE);
 			bcancal.setVisibility(View.GONE);
@@ -159,7 +157,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		if (hm && type.equals("file") && contid == pos) {
 
 			final Button bdown = (Button) v.findViewById(R.id.menu_btnDownload);
-			final Button bopen = (Button) v.findViewById(R.id.menu_btnOpen);
 			final Button brename = (Button) v.findViewById(R.id.menu_btnRename);
 			final Button bdelete = (Button) v.findViewById(R.id.menu_btnDelete);
 			final Button bcancal = (Button) v.findViewById(R.id.menu_btnCancel);
@@ -168,45 +165,37 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			final TextView name = (TextView) v.findViewById(R.id.item_txtName);
 			final TextView size = (TextView) v.findViewById(R.id.item_txtsize);
 
-			switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, true);
+			switchview(bdown, brename, bdelete, bcancal, icon, name, size, true);
 
 			bdown.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
 					new DownloadFile(Ftp.this).execute(cont, Environment.getExternalStorageDirectory().getPath());
-					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
-				}
-			});
-
-			bopen.setOnClickListener(new OnClickListener() {
-
-				public void onClick(View v) {
-					// new DownloadFile().execute(cont, Environment.getExternalStorageDirectory().getPath());
-					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
+					switchview(bdown, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
 
 			brename.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
-					new RenameFile(Ftp.this).execute(cont);
-					
-					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
-					
+					RenameFile2(cont);
+					switchview(bdown, brename, bdelete, bcancal, icon, name, size, false);
+
 				}
 			});
 
 			bdelete.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
-					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
+					deletefile(cont);
+					switchview(bdown, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
 
 			bcancal.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View v) {
-					switchview(bdown, bopen, brename, bdelete, bcancal, icon, name, size, false);
+					switchview(bdown, brename, bdelete, bcancal, icon, name, size, false);
 				}
 			});
 		}
@@ -660,54 +649,80 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 	}
 
-	private class RenameFile extends AsyncTask<String, Integer, Integer> {
-		
-		
-		public RenameFile(Context ctn){
+	private void RenameFile2(final String old) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(Ftp.this);
+		final EditText input = new EditText(Ftp.this);
+		alert.setTitle("Type the new name for " + old);
+		alert.setMessage("New name here:");
 
-			
+		// Set an EditText view to get user input
+		alert.setView(input);
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String news = input.getText().toString();
+				// Do something with value!
+				new RenameFile().execute(old, news);
 
-			
-		}
-		
-		protected Integer doInBackground(String... args) {
-			final String oldname = args[0];
-			AlertDialog.Builder alert = new AlertDialog.Builder(Ftp.this);
+			}
+		});
 
-			alert.setTitle("Title");
-			alert.setMessage("Message");
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Canceled.
+				Log.e(TAG, ":(");
+			}
+		});
 
-			// Set an EditText view to get user input 
-			final EditText input = new EditText(Ftp.this);
-			alert.setView(input);
-
-			
-			alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-				  String newname = input.getText().toString();
-				  // Do something with value!
-				  Log.d(TAG, newname);
-				  ftpclient.ftpRenameFile(oldname, newname);
-				  }
-				});
-
-				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				  public void onClick(DialogInterface dialog, int whichButton) {
-				    // Canceled.
-				  }
-				});
-				alert.show();
-			return null;
-		}
-
-		protected void onPostExecute(Integer result) {
-			super.onPostExecute(result);
-		}
-		
+		alert.show();
 	}
 
-	
-	
+	private String getExtension(String filename) {
+		String extension = "";
+		int i = filename.lastIndexOf('.');
+		if (i > 0) {
+			extension = filename.substring(i + 1);
+		}
+
+		return "." + extension;
+	}
+
+	private class RenameFile extends AsyncTask<String, Integer, String> {
+
+		protected String doInBackground(String... args) {
+			boolean status;
+			String old = args[0];
+			String news = args[1];
+			Log.d(TAG, "new name: " + news);
+			String extensionold = getExtension(old);
+			String extensionnew = getExtension(news);
+
+			if (!news.endsWith(extensionold)) {
+				news = news + extensionold;
+			}
+
+			if (extensionold != extensionnew) {
+				Log.e(TAG, "dammmm");
+			}
+
+			Log.d(TAG, "old extension: " + extensionold);
+			Log.d(TAG, "old: " + old);
+			Log.d(TAG, "new: " + news);
+			status = true;
+			status = ftpclient.ftpRenameFile(old, news);
+			String replay = ftpclient.mFTPClient.getReplyString();
+			Log.d(TAG, replay);
+			return status ? "succes" : "failed: " + replay;
+		}
+
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			Toast.makeText(cntx, result, Toast.LENGTH_LONG).show();
+			if (result.equals("succes"))
+				new Updatelist().execute();
+		}
+
+	}
+
 	private class Updatelist extends AsyncTask<String, String, String> {
 
 		protected String doInBackground(String... params) {
@@ -734,13 +749,13 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 					if (file != null) {
 						size = file.getSize();
 					}
-					Log.d(TAG, "file: " + con);
-					Log.d(TAG, "filesize: " + size);
+					// Log.d(TAG, "file: " + con);
+					// Log.d(TAG, "filesize: " + size);
 					iconID = R.drawable.file;
 					type = "file";
 				} else {
 					con = con.substring(10) + "/";
-					Log.d(TAG, "dir: " + con);
+					// Log.d(TAG, "dir: " + con);
 					type = "dir";
 					iconID = R.drawable.dir;
 				}
@@ -749,7 +764,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				rcontents.add(content);
 				id++;
 			}
-			Log.d(TAG, "*realcontents, length: " + rcontents.size());
+			//Log.d(TAG, "*realcontents, length: " + rcontents.size());
 
 			return null;
 		}
@@ -769,6 +784,55 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	}
 
+	
+	private void deletefile(final String file) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(Ftp.this);
+		alert.setTitle("Confirm");
+		alert.setMessage("Do you want to delete " + file + "?");
+
+		// Set an EditText view to get user input
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Do something with value!
+				//new RenameFile().execute(old, news);
+				new DeleteFile().execute(file);
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Canceled.
+				Log.e(TAG, ":(");
+			}
+		});
+
+		alert.show();
+	}
+	
+	private class DeleteFile extends AsyncTask<String, Integer, String> {
+
+		protected String doInBackground(String... args) {
+			boolean status;
+			String file = args[0];
+			status = true;
+			
+			status = ftpclient.ftpRemoveFile(file);
+			String replay = ftpclient.mFTPClient.getReplyString();
+			
+			Log.d(TAG, replay);
+			
+			return status ? "succes" : "failed: " + replay;
+		}
+
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			Toast.makeText(cntx, result, Toast.LENGTH_LONG).show();
+			if (result.equals("succes"))
+				new Updatelist().execute();
+		}
+
+	}
+	
 	private class MyListAdapter extends ArrayAdapter<Content> {
 
 		public MyListAdapter() {

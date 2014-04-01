@@ -42,47 +42,38 @@
             android:id="@+id/menu_btnDownload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/download1"
+            android:background="@android:drawable/stat_sys_download"
             android:textSize="16sp"
-            android:layout_weight="20"
-            android:visibility="gone" 
+            android:layout_weight="25"
+             android:visibility="gone" 
             style="?android:attr/buttonBarButtonStyle"/>
 
-        <Button
-            android:id="@+id/menu_btnOpen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_launcher"
-            android:textSize="16sp" 
-            android:visibility="gone"
-            android:layout_weight="20" 
-            style="?android:attr/buttonBarButtonStyle"/>
 
         <Button
             android:id="@+id/menu_btnRename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_launcher" 
+            android:background="@android:drawable/ic_menu_edit" 
             android:visibility="gone" 
-            android:layout_weight="20" 
+            android:layout_weight="25" 
             style="?android:attr/buttonBarButtonStyle"/>
 
         <Button
             android:id="@+id/menu_btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/delete" 
+            android:background="@android:drawable/ic_menu_delete" 
             android:visibility="gone" 
-            android:layout_weight="20" 
+            android:layout_weight="25" 
             style="?android:attr/buttonBarButtonStyle"/>
 
         <Button
             android:id="@+id/menu_btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/cancel" 
+            android:background="@android:drawable/ic_delete" 
             android:visibility="gone" 
-            android:layout_weight="20" 
+            android:layout_weight="25" 
             style="?android:attr/buttonBarButtonStyle"/>
 			
     </LinearLayout>
