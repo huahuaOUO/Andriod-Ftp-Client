@@ -30,21 +30,21 @@
         </Button>
 
         <Button
-            android:id="@+id/disconnect"
-            style="?android:attr/buttonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="20"
-            android:text="@string/disconnect"
-            android:textSize="15sp" />
-
-        <Button
             android:id="@+id/local"
             style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="20"
             android:text="@string/local"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/disconnect"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:text="@string/disconnect"
             android:textSize="15sp" />
     </LinearLayout>
 

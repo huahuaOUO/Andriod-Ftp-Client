@@ -83,9 +83,9 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		contentList.setOnItemClickListener(this);
 		contentList.setOnItemLongClickListener(this);
 
-		btnDisconnect.setEnabled(false);
 		btnUpload.setEnabled(false);
 		btnContent.setEnabled(false);
+		btnLocal.setEnabled(false);
 
 		Bundle gotBasket = getIntent().getExtras();
 		ip = gotBasket.getString("ip");
@@ -124,6 +124,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 			logout();
 			break;
 		case R.id.local:
+			Log.d(TAG, "local");
 			break;
 		}
 
@@ -454,32 +455,33 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 			if (result == "true") {
 				Toast.makeText(Ftp.this, MyFTPClient.replay, Toast.LENGTH_LONG).show();
-				btnDisconnect.setEnabled(true);
+				btnLocal.setEnabled(true);
 				btnUpload.setEnabled(true);
 				btnContent.setEnabled(true);
-
-				@SuppressWarnings("unused")
-				Bitmap bmd, bmu;
-				InputStream isd, isu;
-				if (ftpclient.isAllowToDownload()) {
-					isd = getResources().openRawResource(R.drawable.green);
-				} else {
-					isd = getResources().openRawResource(R.drawable.red);
-				}
-
-				if (ftpclient.isAllowToUpload()) {
-					isu = getResources().openRawResource(R.drawable.green);
-				} else {
-					isu = getResources().openRawResource(R.drawable.red);
-				}
-
-				bmd = BitmapFactory.decodeStream(isd);
-				bmu = BitmapFactory.decodeStream(isu);
-
-				// imagedownload.setImageBitmap(bmd);
-				// imageupload.setImageBitmap(bmu);
-
+				
+				
 				try {
+					@SuppressWarnings("unused")
+					Bitmap bmd, bmu;
+					InputStream isd, isu;
+					if (ftpclient.isAllowToDownload()) {
+						isd = getResources().openRawResource(R.drawable.green);
+					} else {
+						isd = getResources().openRawResource(R.drawable.red);
+					}
+
+					if (ftpclient.isAllowToUpload()) {
+						isu = getResources().openRawResource(R.drawable.green);
+					} else {
+						isu = getResources().openRawResource(R.drawable.red);
+					}
+
+					bmd = BitmapFactory.decodeStream(isd);
+					bmu = BitmapFactory.decodeStream(isu);
+
+					// imagedownload.setImageBitmap(bmd);
+					// imageupload.setImageBitmap(bmu);
+
 					isd.close();
 					isu.close();
 				} catch (IOException e) {
@@ -768,7 +770,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 				rcontents.add(content);
 				id++;
 			}
-			//Log.d(TAG, "*realcontents, length: " + rcontents.size());
+			// Log.d(TAG, "*realcontents, length: " + rcontents.size());
 
 			return null;
 		}
@@ -788,7 +790,6 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 	}
 
-	
 	private void deletefile(final String file) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(Ftp.this);
 		alert.setTitle("Confirm");
@@ -798,7 +799,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				// Do something with value!
-				//new RenameFile().execute(old, news);
+				// new RenameFile().execute(old, news);
 				new DeleteFile().execute(file);
 			}
 		});
@@ -812,19 +813,19 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 
 		alert.show();
 	}
-	
+
 	private class DeleteFile extends AsyncTask<String, Integer, String> {
 
 		protected String doInBackground(String... args) {
 			boolean status;
 			String file = args[0];
 			status = true;
-			
+
 			status = ftpclient.ftpRemoveFile(file);
 			String replay = ftpclient.mFTPClient.getReplyString();
-			
+
 			Log.d(TAG, replay);
-			
+
 			return status ? "succes" : "failed: " + replay;
 		}
 
@@ -836,7 +837,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		}
 
 	}
-	
+
 	private class MyListAdapter extends ArrayAdapter<Content> {
 
 		public MyListAdapter() {
