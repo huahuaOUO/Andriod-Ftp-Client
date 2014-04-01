@@ -3,37 +3,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <Button
-        android:id="@+id/getContent"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/lin"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/get_Content" />
+        android:weightSum="100" >
 
-    <Button
-        android:id="@+id/disconnect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/disconnect" />
+        <Button
+            android:id="@+id/getContent"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:text="@string/get_Content"
+            android:textSize="15sp" />
 
-    <Button
-        android:id="@+id/upload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/txtPath"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@+id/getContent"
-        android:text="@string/upload" />
+        <Button
+            android:id="@+id/upload"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:text="@string/upload"
+            android:textSize="15sp" >
+        </Button>
+
+        <Button
+            android:id="@+id/disconnect"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:text="@string/disconnect"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/local"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:text="@string/local"
+            android:textSize="15sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txtPath"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/getContent"
+        android:layout_below="@+id/lin"
         android:layout_marginLeft="17dp"
         android:text="Path /"
         android:textAppearance="?android:attr/textAppearanceLarge" />

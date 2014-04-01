@@ -61,7 +61,7 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 	public TextView txtPath;
 	private List<Content> rcontents = new ArrayList<Content>();
 
-	private Button btnUpload, btnDisconnect, btnContent;
+	private Button btnUpload, btnDisconnect, btnContent, btnLocal;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -72,11 +72,13 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		btnUpload = (Button) findViewById(R.id.upload);
 		btnDisconnect = (Button) findViewById(R.id.disconnect);
 		btnContent = (Button) findViewById(R.id.getContent);
+		btnLocal = (Button) findViewById(R.id.local);
 		txtPath = (TextView) findViewById(R.id.txtPath);
 
 		btnDisconnect.setOnClickListener(this);
 		btnUpload.setOnClickListener(this);
 		btnContent.setOnClickListener(this);
+		btnLocal.setOnClickListener(this);
 		contentList = (ListView) findViewById(R.id.contentList);
 		contentList.setOnItemClickListener(this);
 		contentList.setOnItemLongClickListener(this);
@@ -120,6 +122,8 @@ public class Ftp extends Activity implements OnClickListener, OnItemClickListene
 		case R.id.disconnect:
 			Disconnect();
 			logout();
+			break;
+		case R.id.local:
 			break;
 		}
 

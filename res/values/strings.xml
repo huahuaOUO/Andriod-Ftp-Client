@@ -13,6 +13,7 @@
     <string name="get_Content">Refresh</string>
     <string name="upload">Upload</string>
     <string name="disconnect">Disconnect</string>
+    <string name="local">Local</string>
     <string name="allowdownload">Is allow to download</string>
     <string name="allowupload">Is allow to upload</string>
     <string name="m_download">Download</string>
