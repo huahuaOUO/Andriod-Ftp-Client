@@ -26,7 +26,8 @@
 	<string name="install_filemanager">Please install a File Manager.</string> 
 	<string name="Updated">Updated</string> 
 	<string name="Download_success">Download success</string> 
-	<string name="Download_failed">Download failed</string> 
+	<string name="Download_failed">Download failed</string>
+	<string name="path">Path:</string>
 	
     <string-array name="connection_protocol_array">
         <item>FTP - File Transfer Protocol</item>

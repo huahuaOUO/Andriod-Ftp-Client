@@ -55,7 +55,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/lin"
         android:layout_marginLeft="17dp"
-        android:text="Path /"
+        android:text="@string/path"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ListView
