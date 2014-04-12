@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+ <Button
+     android:id="@+id/Button01"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentLeft="true"
+     android:layout_marginTop="76dp"
+     android:text="Cancel" />
+
+ <ImageView
+     android:id="@+id/imageView1"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignParentLeft="true"
+     android:layout_alignParentTop="true"
+     android:src="@drawable/ic_launcher" />
+
+ <EditText
+     android:id="@+id/etxname"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_alignParentLeft="true"
+     android:layout_below="@+id/imageView1"
+     android:ems="10" />
+
+ <TextView
+     android:id="@+id/tvOldname"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignBottom="@+id/imageView1"
+     android:layout_alignParentRight="true"
+     android:layout_alignParentTop="true"
+     android:layout_toRightOf="@+id/imageView1"
+     android:text="" />
+
+ <Button
+     android:id="@+id/btnOk"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignBaseline="@+id/Button01"
+     android:layout_alignBottom="@+id/Button01"
+     android:layout_alignParentRight="true"
+     android:text="OK" />
+ 
+ </RelativeLayout>
